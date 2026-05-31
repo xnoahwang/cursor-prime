@@ -72,6 +72,7 @@ This is non-negotiable. Skip only for one-line fixes.
 ## Code
 - Standard naming. No `var1`, `tmp2`. Isolate Logic / IO / Action.
 
-## Persistence
-- Update `progress.md` after milestones — keep its format: Current Focus / Completed / Next Steps / Known Issues.
-- Update `.cursor/rules/project.mdc` when stack decisions are finalized.
+## Persistence (auto-bootstrap; no per-project setup needed)
+- `progress.md` is the working log. If it does not exist, create it at the project root the first time you complete a milestone, using this structure: Current Focus / Completed / Next Steps / Known Issues. Update it after each milestone.
+- `.cursor/rules/project.mdc` holds project context (tech stack, key paths, commands). Create or update it once stack decisions are finalized — don't create an empty placeholder preemptively.
+- Do NOT auto-create `.gitignore`; the user's global gitignore already covers common noise (node_modules, .venv, __pycache__, Cursor caches). Add project-specific ignores only when asked.
