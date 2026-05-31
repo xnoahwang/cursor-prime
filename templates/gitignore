@@ -1,0 +1,20 @@
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Build / packaging
+build/
+dist/
+*.egg-info/
+
+# Local runtime data
+data/
+*.db
+*.sqlite
+
+# Cursor local-only artifacts (rules/ commands/ stay in git)
+.cursor/cache/
+.cursor/plugins/cache/
+.cursor/logs/
+.cursor/.local/
