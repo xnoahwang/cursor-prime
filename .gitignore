@@ -1,4 +1,8 @@
-# Local-only artifacts that shouldn't be committed
+# Local-only artifacts
 *.bak.*
 .DS_Store
 Thumbs.db
+
+# init.ps1 scaffold (canonical copies in templates/)
+progress.md
+.cursor/rules/project.mdc
