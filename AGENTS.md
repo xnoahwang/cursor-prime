@@ -21,7 +21,7 @@ When the user says something like *"read AGENTS.md and install cursor-prime"*, d
    - Wrote `~/.gitignore_global` and set `git config --global core.excludesfile`.
    - Wrote a best-effort `~/.cursor/rules/behavior.mdc` (global; loading is version-dependent — do NOT rely on it).
    - Wrote a paste-ready `~/.cursor-prime-user-rules.txt` and copied the rule text to the clipboard.
-   - Wrote the manifest `~/.cursor-prime-manifest.json` (version 2.0.1).
+   - Wrote the manifest `~/.cursor-prime-manifest.json` (version 0.2.1).
    - Optional: with `-WithHooks`, installed `~/.cursor/hooks.json` and guard script.
 
 4. **Verify.** Confirm `~/.cursor/commands/plan.md` (and `delta.md`, `verify.md`, `prime-init.md`) and `~/.cursor-prime-manifest.json` exist. Report PASS/FAIL with the real paths checked.
@@ -97,7 +97,7 @@ Manifest stays `~/.cursor-prime-manifest.json` with the same shape. `git config 
 - Run `install.ps1`; confirm `~/.cursor/commands/*.md` exist and the manifest is written.
 - In a scratch project, run `init.ps1`; confirm `.cursor/rules/behavior.mdc` (with `alwaysApply: true`), `.cursor/rules/project.mdc`, `progress.md`, `.gitignore` exist.
 - Open a Cursor chat in that project, ask for a non-trivial task, confirm the agent outputs a `<plan>` and waits for `GO`.
-- Ask to edit README (or another doc); confirm Plan Gate triggers before any file edit (v2.0.1 task class).
+- Ask to edit README (or another doc); confirm Plan Gate triggers before any file edit (v0.2.1 task class).
 
 ## What you should NOT do
 

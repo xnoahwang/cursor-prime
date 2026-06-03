@@ -51,11 +51,11 @@ After setup you get:
 
 ## Changelog
 
-### v2.0.1
+### v0.2.1
 - **Stricter task class** — any file edit (including README, docs, markdown) is non-trivial; only read-only Q&A or a single-line typo in one known location skips Plan Gate.
 - Plan Gate now names Write / StrReplace / Delete explicitly; if the agent edits without a plan, it must stop and replan.
 
-### v2.0
+### v0.2.0
 - **Discipline loop** — Task class, Explore cheap, Session continuity, Handoff in `progress.md`.
 - **`/verify`** — on-demand audit against plan and pre-flight file list.
 - **Enhanced `/plan`** — Out of scope, Done when, Scale, pattern grounding.
@@ -146,7 +146,7 @@ Ask a read-only question, e.g. *What does the Plan Gate section in behavior.mdc 
 
 **Pass:** a direct answer, no `<plan>` block and no wait for `GO`.
 
-### Documentation edit (non-trivial — v2.0.1+)
+### Documentation edit (non-trivial — v0.2.1+)
 
 Ask to change a doc file, for example:
 
