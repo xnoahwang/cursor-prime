@@ -2,6 +2,8 @@
 
 Produce a **Delta Report** for the work just completed, then a 2–3 line summary. Be honest — the point is to surface drift, not to look clean.
 
+If the user ran `/verify` in this session, incorporate its outcome (especially any FAIL items).
+
   Delta Report
   - Files changed: <path>  (+N / -M)   one line per file
   - Outside plan: ⚠️ <path> — <one-line reason>   (omit section if none)

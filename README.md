@@ -29,6 +29,8 @@ After setup you get:
 
 **Discipline (what the AI is told not to do):**
 - **Plan Gate** — the agent outputs a `<plan>` and waits for your `GO` before writing code on non-trivial tasks.
+- **Task class** — trivial tasks skip ceremony; workflow-scale tasks must be phased in the plan.
+- **Explore cheap** — search-first, read-minimal; the pre-flight file list bounds reads and writes.
 - **Surgical Changes** — don't touch adjacent code, comments, or formatting; every changed line traces to the request.
 - **Simplicity** — build only what was asked; no speculative abstractions.
 
@@ -37,12 +39,28 @@ After setup you get:
 - **Verify Receipt** — exact command and exact output, not "tested and works".
 - **Edge Case Checklist** — empty / malformed / large input behavior for every public function or CLI.
 - **Delta Report** — at the end of every non-trivial task.
+- **Session handoff** — `progress.md` Handoff section when pausing mid-task.
 
 **Cursor extras:**
-- **`/plan`** — force the Plan Gate on the current request.
+- **`/plan`** — force the Plan Gate on the current request (includes out-of-scope, done-when, pattern grounding).
+- **`/verify`** — on-demand audit against the plan and pre-flight list (no always-on token cost).
 - **`/delta`** — produce a Delta Report for work just done.
 - **`/prime-init`** — scaffold the rules into the current project.
+- **Optional hooks** — `-WithHooks` on install/init asks before destructive shell commands (off by default).
 - **Global gitignore** — `__pycache__`, `node_modules`, `.venv`, IDE/OS noise, Cursor caches.
+
+## Changelog
+
+### v2.0.1
+- **Stricter task class** — any file edit (including README, docs, markdown) is non-trivial; only read-only Q&A or a single-line typo in one known location skips Plan Gate.
+- Plan Gate now names Write / StrReplace / Delete explicitly; if the agent edits without a plan, it must stop and replan.
+
+### v2.0
+- **Discipline loop** — Task class, Explore cheap, Session continuity, Handoff in `progress.md`.
+- **`/verify`** — on-demand audit against plan and pre-flight file list.
+- **Enhanced `/plan`** — Out of scope, Done when, Scale, pattern grounding.
+- **Optional hooks** — `install.ps1 -WithHooks` / `init.ps1 -WithHooks` for destructive-shell guard (off by default).
+- **`project.mdc`** — verify commands and optional protected paths.
 
 ## Requirements
 
@@ -77,6 +95,8 @@ This installs the global slash commands, the global gitignore (+ `git config cor
 
 Reinstall on top of an existing install: `.\install.ps1 -Force`
 
+Optional destructive-command guard (user-level hooks): `.\install.ps1 -Force -WithHooks`
+
 > **The single manual step (both options):** paste into Settings → Rules → User Rules. Cursor has no file/API to set User Rules, so no script can do it for you. It takes ~10 seconds, once per machine.
 
 ## Initialize a project (primary mechanism)
@@ -93,21 +113,66 @@ Creates:
 | File | Purpose |
 |------|---------|
 | `.cursor\rules\behavior.mdc` | Always-applied Plan Gate + Karpathy rules |
-| `.cursor\rules\project.mdc` | Project context (tech stack / commands), pulled in when relevant |
-| `progress.md` | Working log updated after milestones |
+| `.cursor\rules\project.mdc` | Project context (tech stack / commands / verify / protected paths), pulled in when relevant |
+| `progress.md` | Working log with Handoff for session resume |
 | `.gitignore` | Project-specific ignores (secrets, runtime data, Cursor caches) |
+| `.cursor\hooks\*` | Optional (`-WithHooks`): asks before destructive shell commands |
 
 Existing files are never overwritten without `-Force` (which backs them up to `.bak.<timestamp>` first).
 
+Project hooks: `& "$env:USERPROFILE\cursor-prime\init.ps1" -WithHooks`
+
 Or, from inside a Cursor chat, just run the `/prime-init` command.
 
-## Verify
+## Testing
 
-Open a new Cursor chat in an initialized project and ask for a non-trivial task, e.g.:
+Use these checks after install (and the User Rules paste) or after `init.ps1` in a project. Start a **new chat** so rules load cleanly.
+
+### Plan Gate (non-trivial task)
+
+Ask for something that clearly needs code, for example:
 
 > Write a Python CLI that downloads a URL and prints all `<a>` links grouped by domain.
 
-The agent should respond with a `<plan>` block and stop, waiting for `GO`. If it writes code immediately, check `.cursor/rules/behavior.mdc` exists and has `alwaysApply: true` in its frontmatter.
+**Pass:** the agent replies with a `<plan>` block (pre-flight file list, Out of scope, Done when) and **stops** — no file edits, no implementation yet.
+
+Reply with the literal word `GO`. **Pass:** the agent then implements and ends with a Delta Report.
+
+**Fail:** the agent writes or edits files before you say `GO` → rules are not active in this chat (see troubleshooting below).
+
+### Trivial task (should skip the gate)
+
+Ask a read-only question, e.g. *What does the Plan Gate section in behavior.mdc require?*
+
+**Pass:** a direct answer, no `<plan>` block and no wait for `GO`.
+
+### Documentation edit (non-trivial — v2.0.1+)
+
+Ask to change a doc file, for example:
+
+> Add a short "Testing" section to README explaining how to verify Plan Gate.
+
+**Pass:** `<plan>` with pre-flight file list (e.g. `README.md`), Out of scope, Done when — then **wait for `GO`** before editing.
+
+**Fail:** the agent edits README or other docs immediately. Re-paste User Rules from `~/.cursor-prime-user-rules.txt` after `install.ps1 -Force`.
+
+### Force the gate
+
+Type `/plan` before a request (or run `/plan` alone) to treat the task as non-trivial even if the model might classify it as trivial.
+
+### Audit after work
+
+After you reply `GO` and the agent finishes, run `/verify` to check the diff against the plan and pre-flight list. Use `/delta` if you only need the end-of-task summary.
+
+### Troubleshooting
+
+| Symptom | Likely cause |
+|---|---|
+| Code before `GO` on non-trivial tasks | User Rules not pasted, or project missing `.cursor/rules/behavior.mdc` |
+| Rules seem ignored | Old chat — open a new one; confirm frontmatter has `alwaysApply: true` |
+| Gate works in one project only | You ran `init.ps1` there but skipped the global User Rules paste |
+
+Confirm the file exists: `.cursor/rules/behavior.mdc` with `alwaysApply: true` in its YAML frontmatter.
 
 ## What it changes on your machine
 
@@ -117,6 +182,7 @@ The agent should respond with a `<plan>` block and stop, waiting for `GO`. If it
 |------|--------|
 | `~/.cursor/commands/*.md` | `home/.cursor/commands/*.md` |
 | `~/.cursor/rules/behavior.mdc` | `templates/behavior.mdc` (best-effort) |
+| `~/.cursor/hooks.json` + `~/.cursor/hooks/*` | `home/.cursor/hooks/*` (only with `-WithHooks`) |
 | `~/.gitignore_global` | `home/.gitignore_global` |
 | `~/.cursor-prime-user-rules.txt` | generated from `templates/behavior.mdc` (paste-ready User Rules) |
 | `git config --global core.excludesfile` | set to `~/.gitignore_global` |

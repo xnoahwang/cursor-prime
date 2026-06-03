@@ -13,17 +13,18 @@ When the user says something like *"read AGENTS.md and install cursor-prime"*, d
      ```
      powershell -NoProfile -ExecutionPolicy Bypass -File .\install.ps1
      ```
-     Add `-Force` if a previous install exists.
+     Add `-Force` if a previous install exists. Add `-WithHooks` for an optional destructive-shell guard (off by default).
    - **macOS / Linux:** there is no `.sh` shipped yet. Port `install.ps1` → `install.sh` per the "OS adaptation" section below, run it, then keep the `.ps1` files in place.
 
 3. **Know what the installer did automatically (no user action needed):**
-   - Installed global slash commands `/plan`, `/delta`, `/prime-init` into `~/.cursor/commands/`.
+   - Installed global slash commands `/plan`, `/delta`, `/verify`, `/prime-init` into `~/.cursor/commands/`.
    - Wrote `~/.gitignore_global` and set `git config --global core.excludesfile`.
    - Wrote a best-effort `~/.cursor/rules/behavior.mdc` (global; loading is version-dependent — do NOT rely on it).
    - Wrote a paste-ready `~/.cursor-prime-user-rules.txt` and copied the rule text to the clipboard.
-   - Wrote the manifest `~/.cursor-prime-manifest.json`.
+   - Wrote the manifest `~/.cursor-prime-manifest.json` (version 2.0.1).
+   - Optional: with `-WithHooks`, installed `~/.cursor/hooks.json` and guard script.
 
-4. **Verify.** Confirm `~/.cursor/commands/plan.md` (and `delta.md`, `prime-init.md`) and `~/.cursor-prime-manifest.json` exist. Report PASS/FAIL with the real paths checked.
+4. **Verify.** Confirm `~/.cursor/commands/plan.md` (and `delta.md`, `verify.md`, `prime-init.md`) and `~/.cursor-prime-manifest.json` exist. Report PASS/FAIL with the real paths checked.
 
 5. **Surface the ONE manual step — this is mandatory and you CANNOT do it for the user** (Cursor has no file/API write for User Rules). End your response with this as the single, highlighted action item:
    > **One manual step left.** The rules text is already on your clipboard (backup at `~/.cursor-prime-user-rules.txt`). Open **Cursor → Settings → Rules → User Rules**, click the box, press **Ctrl+V** (Cmd+V on macOS), and **Save**. Do this once and the Plan Gate applies automatically to every project, including new ones.
@@ -96,6 +97,7 @@ Manifest stays `~/.cursor-prime-manifest.json` with the same shape. `git config 
 - Run `install.ps1`; confirm `~/.cursor/commands/*.md` exist and the manifest is written.
 - In a scratch project, run `init.ps1`; confirm `.cursor/rules/behavior.mdc` (with `alwaysApply: true`), `.cursor/rules/project.mdc`, `progress.md`, `.gitignore` exist.
 - Open a Cursor chat in that project, ask for a non-trivial task, confirm the agent outputs a `<plan>` and waits for `GO`.
+- Ask to edit README (or another doc); confirm Plan Gate triggers before any file edit (v2.0.1 task class).
 
 ## What you should NOT do
 
@@ -111,7 +113,9 @@ templates/behavior.mdc          # canonical rules (alwaysApply) — used by init
 templates/project.mdc           # project-context rule (agent-requested)
 templates/progress.md           # progress log starter
 templates/gitignore             # project .gitignore starter
-home/.cursor/commands/*.md      # global slash commands (/plan, /delta, /prime-init)
+home/.cursor/commands/*.md      # global slash commands (/plan, /delta, /verify, /prime-init)
+home/.cursor/hooks/*            # optional user hooks (-WithHooks)
+templates/hooks/*               # optional project hooks (init.ps1 -WithHooks)
 home/.gitignore_global          # global gitignore
 .cursor/rules/behavior.mdc      # this repo dogfoods its own rules
 install.ps1                     # global install (commands, gitignore, best-effort rule)

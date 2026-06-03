@@ -22,5 +22,15 @@ Cursor pulls this rule in when it's relevant, or reference it explicitly with `@
 - Build: [TBD]
 - Test: [TBD]
 
+## Verify Commands
+<!-- Standard commands the agent should use in plans and Verify Receipt. -->
+- Lint: [TBD]
+- Test: [TBD]
+- Build: [TBD]
+
+## Protected Paths
+<!-- Optional. Agent must not edit these unless listed in a plan pre-flight file list. -->
+- (none — add paths like `migrations/`, `LICENSE`, or vendor dirs as needed)
+
 ## Project-Specific Guidelines
 - (add project rules here as the project evolves)

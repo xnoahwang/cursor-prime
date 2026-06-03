@@ -9,6 +9,7 @@
       - home\.cursor\commands\*.md   -> ~/.cursor/commands/   (Cursor global slash commands; reliable)
       - templates\behavior.mdc       -> ~/.cursor/rules/behavior.mdc (best-effort global rule; see note)
       - home\.gitignore_global       -> ~/.gitignore_global   (+ git config core.excludesfile)
+      - home\.cursor\hooks\*         -> ~/.cursor/hooks/      (optional; -WithHooks)
 
     Cursor's true global "User Rules" live in Settings -> Rules and are stored
     inside Cursor (cloud-synced), so they CANNOT be installed from a file.
@@ -22,15 +23,20 @@
 .PARAMETER Force
     Reinstall even if a manifest already exists.
 
+.PARAMETER WithHooks
+    Install optional user-level hooks (~/.cursor/hooks.json) that ask before
+    destructive shell commands. Default: off (zero extra dependencies).
+
 .EXAMPLE
     .\install.ps1
 
 .EXAMPLE
-    .\install.ps1 -Force
+    .\install.ps1 -Force -WithHooks
 #>
 [CmdletBinding()]
 param(
-    [switch]$Force
+    [switch]$Force,
+    [switch]$WithHooks
 )
 
 $ErrorActionPreference = 'Stop'
@@ -42,6 +48,33 @@ $Timestamp    = Get-Date -Format 'yyyyMMdd-HHmmss'
 
 function Log  ($m) { Write-Host "[cursor-prime] $m" -ForegroundColor Cyan }
 function Warn ($m) { Write-Host "[cursor-prime] $m" -ForegroundColor Yellow }
+
+function Install-FilePair {
+    param(
+        [string]$SrcRel,
+        [string]$DstAbs,
+        [ref]$InstalledList
+    )
+    $src = Join-Path $Repo $SrcRel
+    if (-not (Test-Path $src)) { throw "Source missing: $src" }
+
+    $dstDir = Split-Path $DstAbs -Parent
+    if (-not (Test-Path $dstDir)) {
+        New-Item -ItemType Directory -Force -Path $dstDir | Out-Null
+    }
+
+    $backup = $null
+    if (Test-Path $DstAbs) {
+        $backup = "$DstAbs.bak.$Timestamp"
+        Copy-Item $DstAbs $backup -Force
+        Log "Backed up: $DstAbs -> $backup"
+    }
+
+    Copy-Item $src $DstAbs -Force
+    Log "Installed: $DstAbs"
+
+    $InstalledList.Value += [pscustomobject]@{ path = $DstAbs; backup = $backup }
+}
 
 # (source-relative-to-repo, destination-absolute) pairs.
 $Files = @(
@@ -60,6 +93,14 @@ if (Test-Path $cmdSrcDir) {
     }
 }
 
+if ($WithHooks) {
+    $Files += @{ Src = 'home\.cursor\hooks\hooks.json'; Dst = Join-Path $HomeDir '.cursor\hooks.json' }
+    $Files += @{
+        Src = 'home\.cursor\hooks\guard-destructive.ps1'
+        Dst = Join-Path $HomeDir '.cursor\hooks\guard-destructive.ps1'
+    }
+}
+
 if ((Test-Path $ManifestPath) -and -not $Force) {
     Warn "Already installed (manifest at $ManifestPath)."
     Warn "Run .\uninstall.ps1 first, or use -Force to reinstall."
@@ -75,25 +116,7 @@ foreach ($f in $Files) {
 $installedFiles = @()
 
 foreach ($f in $Files) {
-    $src = Join-Path $Repo $f.Src
-    $dst = $f.Dst
-
-    $dstDir = Split-Path $dst -Parent
-    if (-not (Test-Path $dstDir)) {
-        New-Item -ItemType Directory -Force -Path $dstDir | Out-Null
-    }
-
-    $backup = $null
-    if (Test-Path $dst) {
-        $backup = "$dst.bak.$Timestamp"
-        Copy-Item $dst $backup -Force
-        Log "Backed up: $dst -> $backup"
-    }
-
-    Copy-Item $src $dst -Force
-    Log "Installed: $dst"
-
-    $installedFiles += [pscustomobject]@{ path = $dst; backup = $backup }
+    Install-FilePair -SrcRel $f.Src -DstAbs $f.Dst -InstalledList ([ref]$installedFiles)
 }
 
 # Capture and update git core.excludesfile
@@ -129,8 +152,9 @@ try { Set-Clipboard -Value $userRulesText -ErrorAction Stop; $clipOk = $true } c
 # Write manifest
 $manifest = [pscustomobject]@{
     name         = 'cursor-prime'
-    version      = '1.0.0'
+    version      = '2.0.1'
     installed_at = (Get-Date).ToString('o')
+    with_hooks   = [bool]$WithHooks
     files        = $installedFiles
     git_config   = [pscustomobject]@{
         key      = 'core.excludesfile'
@@ -143,7 +167,12 @@ $manifest | ConvertTo-Json -Depth 6 | Set-Content -Path $ManifestPath -Encoding 
 Log "Manifest: $ManifestPath"
 
 Write-Host ""
-Log "Global slash commands installed: /plan, /delta, /prime-init (open the command menu to use them)."
+Log "Global slash commands installed: /plan, /delta, /verify, /prime-init (open the command menu to use them)."
+if ($WithHooks) {
+    Log "User hooks installed (~/.cursor/hooks.json). Restart Cursor if hooks do not load immediately."
+} else {
+    Warn "Hooks not installed (default). Use -WithHooks to add destructive-command guard."
+}
 Write-Host ""
 Warn "ONE manual step makes the rules global + automatic (Cursor has no file API for User Rules):"
 if ($clipOk) {
