@@ -23,7 +23,7 @@ Cursor pulls this rule in when it's relevant, or reference it explicitly with `@
 - Test: [TBD]
 
 ## Verify Commands
-<!-- Standard commands the agent should use in plans and Verify Receipt. -->
+<!-- Hard gates for plans, Verify Receipt, and /loop. Fill these in — loop discipline needs executable verify commands. -->
 - Lint: [TBD]
 - Test: [TBD]
 - Build: [TBD]

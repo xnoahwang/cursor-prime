@@ -6,6 +6,7 @@ Cursor-native configuration: Karpathy-derived coding rules, a strict Plan Gate, 
 
 - **Save credits.** The agent plans before it codes, so you catch wrong directions *before* tokens are spent on wrong implementations.
 - **Honest reporting, not blind trust.** Every non-trivial task ends with a Delta Report (files changed, anything outside plan, verify output) so you can spot drift without reading every diff.
+- **Light loop discipline.** After `GO`, fix-and-retry with a hard verifier (test/lint/build), iteration cap, and `/loop` — session-only, not overnight automation.
 - **Karpathy discipline, automated.** Surgical changes, simplicity first, verifiable goals, terse output. No "Great! Let me also refactor this for you" sprawl.
 - **Cursor-native.** Uses `.cursor/rules/*.mdc` (always-applied), Cursor global slash commands, and `AGENTS.md`-compatible markdown — not a foreign format bolted on.
 - **Zero lock-in.** One uninstall command and your machine is back to how it was.
@@ -37,19 +38,31 @@ After setup you get:
 **Honest reporting (what the AI is told to produce):**
 - **Pre-flight File List** — every file the plan will touch is named; touching anything else mid-task forces a stop.
 - **Verify Receipt** — exact command and exact output, not "tested and works".
+- **Hard verifier** — run plan verify commands before declaring done; no self-grade when test/lint/build exists.
+- **Loop discipline (light loop)** — after `GO`, iterate fix → verify until PASS or max iterations (default 8); credit guard; loop-worthiness check on workflow-scale tasks.
 - **Edge Case Checklist** — empty / malformed / large input behavior for every public function or CLI.
 - **Delta Report** — at the end of every non-trivial task.
-- **Session handoff** — `progress.md` Handoff section when pausing mid-task.
+- **Session handoff** — `progress.md` Handoff and Loop State when pausing mid-task or mid-loop.
 
 **Cursor extras:**
-- **`/plan`** — force the Plan Gate on the current request (includes out-of-scope, done-when, pattern grounding).
-- **`/verify`** — on-demand audit against the plan and pre-flight list (no always-on token cost).
+- **`/plan`** — force the Plan Gate on the current request (includes out-of-scope, done-when, max iterations, loop worthiness, pattern grounding).
+- **`/verify`** — on-demand audit against the plan and pre-flight list (includes hard-verifier check; no always-on token cost).
+- **`/loop`** — after `GO`, fix-and-retry until verify passes or iteration cap (requires hard gate in the plan).
 - **`/delta`** — produce a Delta Report for work just done.
 - **`/prime-init`** — scaffold the rules into the current project.
 - **Optional hooks** — `-WithHooks` on install/init asks before destructive shell commands (off by default).
 - **Global gitignore** — `__pycache__`, `node_modules`, `.venv`, IDE/OS noise, Cursor caches.
 
 ## Changelog
+
+### v0.2.2
+- **Loop discipline (light loop)** — session-only fix-and-retry after `GO`: iterate until verify PASS or max iterations (default 8); credit guard; loop-worthiness four-check on workflow-scale tasks.
+- **Hard verifier** — non-trivial tasks must *run* verify commands (test/lint/build/typecheck) before done; transcript required; no self-grade as sole proof.
+- **`/loop`** — global slash command for EXECUTE → VERIFY → ITERATE until `LOOP DONE` or `LOOP CAP`.
+- **Enhanced `/plan`** — Max iterations, loop worthiness (workflow-scale), verify as hard gate.
+- **Enhanced `/verify`** — Hard verifier audit line; suggests `/loop` when gate fails under cap.
+- **`progress.md`** — Loop State section for multi-iteration work.
+- **`project.mdc`** — Verify Commands documented as hard gates for plans and `/loop`.
 
 ### v0.2.1
 - **Stricter task class** — any file edit (including README, docs, markdown) is non-trivial; only read-only Q&A or a single-line typo in one known location skips Plan Gate.
@@ -114,7 +127,7 @@ Creates:
 |------|---------|
 | `.cursor\rules\behavior.mdc` | Always-applied Plan Gate + Karpathy rules |
 | `.cursor\rules\project.mdc` | Project context (tech stack / commands / verify / protected paths), pulled in when relevant |
-| `progress.md` | Working log with Handoff for session resume |
+| `progress.md` | Working log with Handoff and Loop State for session / loop resume |
 | `.gitignore` | Project-specific ignores (secrets, runtime data, Cursor caches) |
 | `.cursor\hooks\*` | Optional (`-WithHooks`): asks before destructive shell commands |
 
@@ -164,6 +177,33 @@ Type `/plan` before a request (or run `/plan` alone) to treat the task as non-tr
 
 After you reply `GO` and the agent finishes, run `/verify` to check the diff against the plan and pre-flight list. Use `/delta` if you only need the end-of-task summary.
 
+### Hard verifier
+
+Fill **Verify Commands** in `.cursor/rules/project.mdc` (e.g. test, lint). After `GO`, the agent should run those commands and paste output in the Delta Report.
+
+**Pass:** Delta Report includes a real command and transcript, not "tested and works".
+
+**Fail:** claims done without running verify when a hard gate exists.
+
+### Light loop (`/loop`)
+
+Use after a plan with verify commands and `GO`. If verify fails, send `/loop` (or let the agent iterate per Loop Discipline).
+
+**Pass:** `ITERATING (n/max)` → fixes one failure per pass → `LOOP DONE` when verify passes, or `LOOP CAP` at max iterations with a summary.
+
+**Fail:** retries without running verify, or continues past the cap silently.
+
+Quick smoke test (any project with `project.mdc` verify commands):
+
+```
+/plan
+Goal: add one line to progress.md Completed: "loop test".
+Verify: <your test or lint command from project.mdc>
+Max iterations: 3
+```
+
+Reply `GO`. If verify fails, run `/loop`.
+
 ### Troubleshooting
 
 | Symptom | Likely cause |
@@ -200,6 +240,8 @@ cd $env:USERPROFILE\cursor-prime
 git pull
 .\install.ps1 -Force
 ```
+
+Re-paste User Rules from `~/.cursor-prime-user-rules.txt` (or the installer clipboard) so global rules match v0.2.2.
 
 ## Uninstall
 

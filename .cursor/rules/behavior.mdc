@@ -64,6 +64,36 @@ When claiming verification, paste the exact command you ran and its exact output
 "Tested and works" without a transcript is not acceptable for non-trivial tasks.
 Prefer verify commands documented in `@project` when available.
 
+**Hard verifier:** For non-trivial tasks, you must **run** the plan's verify command(s) before declaring done. Inspection-only or self-graded passes are not valid when a hard gate exists (test, lint, build, typecheck). No transcript = not done.
+
+## Loop Discipline (light loop)
+
+Session-only fix-and-retry after Plan Gate `GO` — not unattended cron or overnight automation.
+
+### Iterate until pass or cap
+When verify FAILs and the user wants another pass (or sent `/loop`):
+1. Pick the **single highest-impact** failure.
+2. Make the **smallest** change that addresses it.
+3. Re-run **all** verify commands from the plan.
+4. Repeat until all PASS or **max iterations** reached (default **8**; plan or user may set lower).
+
+On cap: STOP, summarize what changed and what still fails, update `progress.md` Loop State if pausing. Do not silently continue.
+
+### Loop worthiness
+Before proposing iterate-until-green on `workflow-scale` tasks, all four must be true:
+- Task repeats at least weekly
+- Hard gate exists (test, lint, build, typecheck)
+- Agent can finish end-to-end without mid-task human steps
+- Done is objective, not taste
+
+If any is false: one plan + GO + single execution pass unless the user explicitly sends `/loop`.
+
+### Loop state
+During multi-iteration work, update `progress.md` **Loop State** when stopping at iteration cap or before pausing mid-task.
+
+### Credit guard
+Each iteration re-sends growing context. Fix one failure per pass; no parallel fix attempts unless the plan says so.
+
 ## Edge Case Checklist
 Before declaring a non-trivial task done, for each new public function, CLI command, or HTTP endpoint, briefly note (one line each):
 - Empty / missing input behavior

@@ -13,6 +13,7 @@ If that path does not exist, ask the user where they cloned `cursor-prime`, then
 After it runs, confirm these files exist and report what was created vs. skipped:
 - `.cursor/rules/behavior.mdc`  (always-applied discipline rules)
 - `.cursor/rules/project.mdc`   (project context — fill in tech stack, verify commands, protected paths)
+- Global slash commands: `/plan`, `/delta`, `/verify`, `/loop`, `/prime-init`
 - `progress.md`
 - `.gitignore`
 
