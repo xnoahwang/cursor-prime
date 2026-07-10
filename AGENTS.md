@@ -22,29 +22,29 @@ When the user says something like *"read AGENTS.md and install cursor-prime"*, d
    - **macOS / Linux:** there is no `.sh` shipped yet. Port `install.ps1` → `install.sh` per the "OS adaptation" section below, run it, then keep the `.ps1` files in place.
 
 3. **Know what the installer did automatically (no user action needed):**
-   - Installed global slash commands `/plan`, `/delta`, `/verify`, `/loop`, `/prime-init` into `~/.cursor/commands/`.
+   - Installed global slash commands `/plan`, `/delta`, `/verify`, `/loop`, `/handoff`, `/prime-init` into `~/.cursor/commands/`.
    - Wrote `~/.gitignore_global` and set `git config --global core.excludesfile`.
    - Wrote a best-effort `~/.cursor/rules/behavior.mdc` (global; loading is version-dependent — do NOT rely on it).
    - Wrote a paste-ready `~/.cursor-prime-user-rules.txt` and copied the rule text to the clipboard.
-   - Wrote the manifest `~/.cursor-prime-manifest.json` (version 0.2.2).
+   - Wrote the manifest `~/.cursor-prime-manifest.json` (version 0.2.3).
    - Optional: with `-WithHooks`, installed `~/.cursor/hooks.json` and guard script.
 
-4. **Verify.** Confirm `~/.cursor/commands/plan.md`, `delta.md`, `verify.md`, `loop.md`, `prime-init.md`, and `~/.cursor-prime-manifest.json` exist. Report PASS/FAIL with the real paths checked.
+4. **Verify.** Confirm `~/.cursor/commands/plan.md`, `delta.md`, `verify.md`, `loop.md`, `handoff.md`, `prime-init.md`, and `~/.cursor-prime-manifest.json` exist. Report PASS/FAIL with the real paths checked.
 
 5. **Surface the ONE manual step — this is mandatory and you CANNOT do it for the user** (Cursor has no file/API write for User Rules). End your response with this as the single, highlighted action item:
    > **One manual step left.** The rules text is already on your clipboard (backup at `~/.cursor-prime-user-rules.txt`). Open **Cursor → Settings → Rules → User Rules**, click the box, press **Ctrl+V** (Cmd+V on macOS), and **Save**. Do this once and the Plan Gate applies automatically to every project, including new ones.
 
    If the clipboard may have been cleared (e.g. you ran the installer in a non-interactive shell), read `~/.cursor-prime-user-rules.txt` and show its contents so the user can copy it directly.
 
-6. **(Optional) Mention per-project scaffolding.** Tell the user that to also drop project-level files (`project.mdc`, `progress.md`, project `.gitignore`) into the CURRENT project, they can run the `/prime-init` command or `init.ps1`. This is optional — once User Rules is pasted, the discipline already applies everywhere.
+6. **(Optional) Mention per-project scaffolding.** Tell the user that to also drop project-level files (`behavior.mdc`, `maintainability.mdc`, `project.mdc`, `AGENTS.md`, `README.md` stub, `progress.md`, project `.gitignore`) into the CURRENT project, they can run the `/prime-init` command or `init.ps1`. This is how handoff standards land in-tree; User Rules alone carry Plan Gate discipline only.
 
 **Do NOT** claim the install alone makes the Plan Gate globally automatic. The User Rules paste in step 5 is required for that; without it, only the slash commands and gitignore are active.
 
 ## What this repo is
 
-A configuration installer for **Cursor**, adapted from kiro-prime. It delivers the same tool-agnostic discipline rules (Plan Gate, Surgical Changes, Pre-flight File List, Verify Receipt, Edge Case Checklist, Self-Review Delta Report) through Cursor's native mechanisms.
+A configuration installer for **Cursor**, adapted from kiro-prime. It delivers tool-agnostic discipline rules (Plan Gate, Surgical Changes, Pre-flight File List, Verify Receipt, Edge Case Checklist, Self-Review Delta Report) plus handoff-ready maintainability (docs, comments, layout) through Cursor's native mechanisms.
 
-The rules themselves are tool-agnostic and live in `templates/behavior.mdc` (canonical). The only Cursor-specific wording is the Persistence section referencing `.cursor/rules/project.mdc`.
+The discipline rules live in `templates/behavior.mdc` (canonical). Handoff standards live in `templates/maintainability.mdc` (project init; not pasted into User Rules). The only Cursor-specific wording in Persistence references `.cursor/rules/project.mdc`.
 
 ## Why Cursor's delivery differs from Kiro's
 
@@ -99,11 +99,12 @@ Manifest stays `~/.cursor-prime-manifest.json` with the same shape. `git config 
 
 ## Verify
 
-- Run `install.ps1`; confirm `~/.cursor/commands/*.md` exist and the manifest is written.
-- In a scratch project, run `init.ps1`; confirm `.cursor/rules/behavior.mdc` (with `alwaysApply: true`), `.cursor/rules/project.mdc`, `progress.md`, `.gitignore` exist.
+- Run `install.ps1`; confirm `~/.cursor/commands/*.md` (including `handoff.md`) exist and the manifest is written (version 0.2.3).
+- In a scratch project, run `init.ps1`; confirm `.cursor/rules/behavior.mdc` (with `alwaysApply: true`), `.cursor/rules/maintainability.mdc`, `.cursor/rules/project.mdc`, `AGENTS.md`, `README.md`, `progress.md`, `.gitignore` exist.
 - Open a Cursor chat in that project, ask for a non-trivial task, confirm the agent outputs a `<plan>` and waits for `GO`.
 - Ask to edit README (or another doc); confirm Plan Gate triggers before any file edit (v0.2.1 task class).
 - Confirm `/loop` appears in the command menu; after `GO` with a failing verify command, `/loop` should iterate until PASS or `LOOP CAP` (v0.2.2 light loop).
+- Confirm `/handoff` appears; for a new-module task, Done when should include public API docs + entry docs (v0.2.3).
 
 ## What you should NOT do
 
@@ -115,15 +116,19 @@ Manifest stays `~/.cursor-prime-manifest.json` with the same shape. `git config 
 ## Repo structure
 
 ```
-templates/behavior.mdc          # canonical rules (alwaysApply) — used by init AND global install
+templates/behavior.mdc          # canonical Plan Gate rules (alwaysApply) — init AND global install
+templates/maintainability.mdc   # handoff standards (alwaysApply) — project init only
 templates/project.mdc           # project-context rule (agent-requested)
+templates/AGENTS.md             # successor map stub for init
+templates/README.md             # run/test stub for init (skipped if README exists)
 templates/progress.md           # progress log starter
 templates/gitignore             # project .gitignore starter
-home/.cursor/commands/*.md      # global slash commands (/plan, /delta, /verify, /loop, /prime-init)
+home/.cursor/commands/*.md      # global slash commands (/plan, /delta, /verify, /loop, /handoff, /prime-init)
 home/.cursor/hooks/*            # optional user hooks (-WithHooks)
 templates/hooks/*               # optional project hooks (init.ps1 -WithHooks)
 home/.gitignore_global          # global gitignore
 .cursor/rules/behavior.mdc      # this repo dogfoods its own rules
+.cursor/rules/maintainability.mdc
 install.ps1                     # global install (commands, gitignore, best-effort rule)
 init.ps1                        # per-project scaffold (primary mechanism)
 uninstall.ps1                   # manifest-based undo

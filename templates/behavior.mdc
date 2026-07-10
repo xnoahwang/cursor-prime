@@ -44,12 +44,14 @@ Before editing, minimize context cost:
 ## Simplicity
 - Build only what was asked. No speculative abstractions, no unrequested "flexibility".
 - If 200 lines could be 50, rewrite.
+- **Exception (new surfaces):** module headers, public API docs, and entry docs required by `maintainability.mdc` are part of a shippable deliverable — not speculative extras. See intensity tiers there.
 
 ## Surgical Changes
 - Don't touch adjacent code, comments, or formatting.
 - Remove only imports/symbols your change made unused. Mention unrelated dead code; don't delete it.
 - Every changed line must trace to the request.
 - Respect **Protected paths** in `@project` if defined — do not edit them unless listed in the pre-flight file list.
+- **New files** you create should still meet `maintainability.mdc` (headers, public API docs, layout).
 
 ## Pre-flight File List
 Inside the `<plan>` block, include an explicit list of every file you intend to create, modify, or delete.
@@ -58,6 +60,7 @@ If during execution you discover you need to touch a file not on that list, **ST
 ## Goal-Driven
 - Restate the task as a verifiable goal before coding.
 - Each completed block needs a verify step proving PASS/FAIL.
+- For new modules or public APIs, **Done when** must include the maintainability checklist in `maintainability.mdc` (tier C), or the full `/handoff` bar (tier D) when the user asked for handoff-quality delivery.
 
 ## Verify Receipt
 When claiming verification, paste the exact command you ran and its exact output (or relevant tail).
@@ -135,8 +138,11 @@ When pausing a non-trivial task, update `progress.md` **Handoff** (plan status, 
 
 ## Code
 - Standard naming. No `var1`, `tmp2`. Isolate Logic / IO / Action.
+- Prefer conventions already in the repo; if none exist (greenfield), establish them and write them into `AGENTS.md` (and `@project` when the stack is fixed) — do not leave an undocumented one-off style.
 
 ## Persistence (auto-bootstrap; no per-project setup needed)
 - `progress.md` is the working log. If it does not exist, create it at the project root the first time you complete a milestone, using this structure: Current Focus / Completed / Next Steps / Known Issues / Handoff. Update it after each milestone or before pausing a task.
 - `.cursor/rules/project.mdc` holds project context (tech stack, key paths, commands, verify commands, optional protected paths). Create or update it once stack decisions are finalized — don't create an empty placeholder preemptively.
+- `.cursor/rules/maintainability.mdc` (when present via `init`) is always-applied handoff standards — docs, comments, layout. Honor its intensity tiers.
+- `AGENTS.md` / `README.md` are the successor entry points; keep them truthful when you add run paths, layout, or verify steps.
 - Do NOT auto-create `.gitignore`; the user's global gitignore already covers common noise (node_modules, .venv, __pycache__, Cursor caches). Add project-specific ignores only when asked.

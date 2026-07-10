@@ -5,11 +5,14 @@
 
 .DESCRIPTION
     Creates the following in the current working directory:
-      - .cursor\rules\behavior.mdc  (always-applied Plan Gate + Karpathy rules)
-      - .cursor\rules\project.mdc   (project context, agent-requested)
-      - progress.md                 (working log)
-      - .gitignore                  (project-specific ignores)
-      - .cursor\hooks\*             (optional; -WithHooks)
+      - .cursor\rules\behavior.mdc         (always-applied Plan Gate + Karpathy rules)
+      - .cursor\rules\maintainability.mdc  (always-applied handoff standards)
+      - .cursor\rules\project.mdc          (project context, agent-requested)
+      - AGENTS.md                          (successor map for humans and AIs)
+      - README.md                          (run/test stub; skipped if one exists)
+      - progress.md                        (working log)
+      - .gitignore                         (project-specific ignores)
+      - .cursor\hooks\*                    (optional; -WithHooks)
 
     This is the most reliable way to make the Plan Gate apply, because Cursor
     loads .cursor/rules/*.mdc from the open project workspace.
@@ -48,10 +51,13 @@ function Skip ($m) { Write-Host "[cursor-prime init] $m" -ForegroundColor DarkGr
 
 # (template-name-in-repo, target-path-relative-to-cwd) pairs.
 $Files = @(
-    @{ Src = 'behavior.mdc'; Dst = '.cursor\rules\behavior.mdc' }
-    @{ Src = 'project.mdc';  Dst = '.cursor\rules\project.mdc'  }
-    @{ Src = 'progress.md';  Dst = 'progress.md'                }
-    @{ Src = 'gitignore';    Dst = '.gitignore'                 }
+    @{ Src = 'behavior.mdc';        Dst = '.cursor\rules\behavior.mdc' }
+    @{ Src = 'maintainability.mdc'; Dst = '.cursor\rules\maintainability.mdc' }
+    @{ Src = 'project.mdc';         Dst = '.cursor\rules\project.mdc'  }
+    @{ Src = 'AGENTS.md';           Dst = 'AGENTS.md'                  }
+    @{ Src = 'README.md';           Dst = 'README.md'                  }
+    @{ Src = 'progress.md';         Dst = 'progress.md'                }
+    @{ Src = 'gitignore';           Dst = '.gitignore'                 }
 )
 
 if ($WithHooks) {

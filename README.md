@@ -6,6 +6,7 @@ Cursor-native configuration: Karpathy-derived coding rules, a strict Plan Gate, 
 
 - **Save credits.** The agent plans before it codes, so you catch wrong directions *before* tokens are spent on wrong implementations.
 - **Honest reporting, not blind trust.** Every non-trivial task ends with a Delta Report (files changed, anything outside plan, verify output) so you can spot drift without reading every diff.
+- **Handoff-ready by default.** Project init installs maintainability rules plus `AGENTS.md` / `README` stubs so new code is documented for the next human and the next AI — tiered so one-line fixes stay cheap.
 - **Light loop discipline.** After `GO`, fix-and-retry with a hard verifier (test/lint/build), iteration cap, and `/loop` — session-only, not overnight automation.
 - **Karpathy discipline, automated.** Surgical changes, simplicity first, verifiable goals, terse output. No "Great! Let me also refactor this for you" sprawl.
 - **Cursor-native.** Uses `.cursor/rules/*.mdc` (always-applied), Cursor global slash commands, and `AGENTS.md`-compatible markdown — not a foreign format bolted on.
@@ -22,7 +23,7 @@ Kiro installs **one global file** and every project benefits. Cursor has **no re
 | User Rules (Settings → Rules) | global | manual paste | ✅ reliable (no file API) |
 | `~/.cursor/rules/behavior.mdc` | global | `install.ps1` (best-effort) | ⚠️ version-dependent |
 
-**Recommended setup:** run `install.ps1` once, then do its single manual step — paste the rules into **Settings → Rules → User Rules** (the installer copies them to your clipboard and saves a backup at `~/.cursor-prime-user-rules.txt`). That one paste makes the Plan Gate automatic in every project, including new ones. `init.ps1` / `/prime-init` is optional — only for project-level files (`project.mdc`, `progress.md`).
+**Recommended setup:** run `install.ps1` once, then do its single manual step — paste the rules into **Settings → Rules → User Rules** (the installer copies them to your clipboard and saves a backup at `~/.cursor-prime-user-rules.txt`). That one paste makes the Plan Gate automatic in every project, including new ones. Run `init.ps1` / `/prime-init` in each repo for project-level files (`maintainability.mdc`, `project.mdc`, `AGENTS.md`, `README` stub, `progress.md`) so handoff standards live in-tree.
 
 ## What it does
 
@@ -48,12 +49,21 @@ After setup you get:
 - **`/plan`** — force the Plan Gate on the current request (includes out-of-scope, done-when, max iterations, loop worthiness, pattern grounding).
 - **`/verify`** — on-demand audit against the plan and pre-flight list (includes hard-verifier check; no always-on token cost).
 - **`/loop`** — after `GO`, fix-and-retry until verify passes or iteration cap (requires hard gate in the plan).
+- **`/handoff`** — raise the bar to tier D: public API docs, module headers, truthful `AGENTS.md` / `README` / `@project`.
 - **`/delta`** — produce a Delta Report for work just done.
 - **`/prime-init`** — scaffold the rules into the current project.
 - **Optional hooks** — `-WithHooks` on install/init asks before destructive shell commands (off by default).
 - **Global gitignore** — `__pycache__`, `node_modules`, `.venv`, IDE/OS noise, Cursor caches.
 
 ## Changelog
+
+### v0.2.3
+- **Maintainability (handoff-ready)** — always-applied `maintainability.mdc` via `init`: tiered docs/comments/layout so successors (humans and AIs) can continue the work.
+- **`/handoff`** — slash command for tier-D deliverables (interview handoff, milestones, ship quality).
+- **Greenfield pattern grounding** — `/plan` establishes conventions and writes them to `AGENTS.md` when none exist.
+- **Init scaffolds** — `AGENTS.md` + `README.md` stubs; `project.mdc` Documentation / Handoff section.
+- **`/verify`** — Maintainability audit line for tier C/D.
+- Behavior: new surfaces' docs are part of the deliverable (not scope creep); User Rules remain Plan Gate only — run `/prime-init` per project for in-tree handoff standards.
 
 ### v0.2.2
 - **Loop discipline (light loop)** — session-only fix-and-retry after `GO`: iterate until verify PASS or max iterations (default 8); credit guard; loop-worthiness four-check on workflow-scale tasks.
@@ -126,7 +136,10 @@ Creates:
 | File | Purpose |
 |------|---------|
 | `.cursor\rules\behavior.mdc` | Always-applied Plan Gate + Karpathy rules |
-| `.cursor\rules\project.mdc` | Project context (tech stack / commands / verify / protected paths), pulled in when relevant |
+| `.cursor\rules\maintainability.mdc` | Always-applied handoff standards (docs, comments, layout; tiered) |
+| `.cursor\rules\project.mdc` | Project context (tech stack / commands / verify / protected paths / docs), pulled in when relevant |
+| `AGENTS.md` | Successor map — layout, conventions, how to verify |
+| `README.md` | How to run / test (skipped if a README already exists) |
 | `progress.md` | Working log with Handoff and Loop State for session / loop resume |
 | `.gitignore` | Project-specific ignores (secrets, runtime data, Cursor caches) |
 | `.cursor\hooks\*` | Optional (`-WithHooks`): asks before destructive shell commands |
@@ -204,6 +217,14 @@ Max iterations: 3
 
 Reply `GO`. If verify fails, run `/loop`.
 
+### Handoff quality (`/handoff`)
+
+For milestones, interview deliverables, or “make this successor-ready”, run `/handoff` (before or after planning).
+
+**Pass:** Done when includes public API docs, module headers, and truthful `AGENTS.md` / `README` / `@project`; Delta Report has `Maintainability: PASS`.
+
+**Fail:** feature works but new public APIs lack docstrings, or greenfield conventions were never written down.
+
 ### Troubleshooting
 
 | Symptom | Likely cause |
@@ -241,7 +262,7 @@ git pull
 .\install.ps1 -Force
 ```
 
-Re-paste User Rules from `~/.cursor-prime-user-rules.txt` (or the installer clipboard) so global rules match v0.2.2.
+Re-paste User Rules from `~/.cursor-prime-user-rules.txt` (or the installer clipboard) so global rules match v0.2.3. Re-run `init.ps1 -Force` in projects that need the new `maintainability.mdc` / `AGENTS.md` scaffolds (backs up existing files first).
 
 ## Uninstall
 

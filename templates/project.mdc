@@ -32,5 +32,11 @@ Cursor pulls this rule in when it's relevant, or reference it explicitly with `@
 <!-- Optional. Agent must not edit these unless listed in a plan pre-flight file list. -->
 - (none — add paths like `migrations/`, `LICENSE`, or vendor dirs as needed)
 
+## Documentation / Handoff
+<!-- Keep truthful for successors (humans and AIs). See maintainability.mdc. -->
+- README entry: [how to run / test — or "see README.md"]
+- AGENTS map: [layout + conventions — or "see AGENTS.md"]
+- Public API doc style: [e.g. JSDoc / Google-style docstrings / rustdoc]
+
 ## Project-Specific Guidelines
 - (add project rules here as the project evolves)

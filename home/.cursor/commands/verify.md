@@ -15,8 +15,9 @@ If there is no plan or pre-flight file list in this conversation, say so and sto
 2. **Out of scope** — list any work that matches "Out of scope" from the plan.
 3. **Done when** — PASS or FAIL against the stated stop condition; if FAIL, what remains.
 4. **Hard verifier** — were verify commands actually **run** with transcript in Verify Receipt? FAIL if only claimed or self-graded.
-5. **Surgical** — adjacent code, comments, or formatting touched without request?
+5. **Surgical** — adjacent code, comments, or formatting touched without request? (New-file headers/docs required by maintainability do not count as surgical violations.)
 6. **Protected paths** — if `@project` defines protected paths, were any edited without being on the pre-flight list?
+7. **Maintainability** — for plan tier C/D (or any new public API / new module): public API docs present; new module headers present; `AGENTS.md` / `README.md` / `@project` updated if entry points or conventions changed; greenfield conventions written down. Tier A/B: N/A unless docs were made wrong.
 
 ## Output
 
@@ -28,6 +29,7 @@ Verify Report
 - Hard verifier: PASS | FAIL — <missing transcript or self-grade only, if FAIL>
 - Surgical: PASS | FAIL — <issues, if any>
 - Protected paths: PASS | N/A | FAIL — <issues, if any>
+- Maintainability: PASS | N/A | FAIL — <missing docs/headers/entry updates, if FAIL>
 ```
 
-Then one sentence: proceed to Delta, fix findings first, send `/loop` to iterate (if hard gate exists and under max iterations), or re-plan.
+Then one sentence: proceed to Delta, fix findings first, send `/loop` to iterate (if hard gate exists and under max iterations), send `/handoff` to raise the bar to tier D, or re-plan.
