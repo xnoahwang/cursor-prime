@@ -1,4 +1,4 @@
-# cursor-prime
+﻿# cursor-prime
 
 Cursor-native configuration: Karpathy-derived coding rules, a strict Plan Gate, Cursor slash commands, and a global `.gitignore`. Adapted from [kiro-prime](https://github.com/xnoahwang/kiro-prime) for Cursor's rules/commands ecosystem.
 
@@ -11,6 +11,10 @@ Cursor-native configuration: Karpathy-derived coding rules, a strict Plan Gate, 
 - **Karpathy discipline, automated.** Surgical changes, simplicity first, verifiable goals, terse output. No "Great! Let me also refactor this for you" sprawl.
 - **Cursor-native.** Uses `.cursor/rules/*.mdc` (always-applied), Cursor global slash commands, and `AGENTS.md`-compatible markdown — not a foreign format bolted on.
 - **Zero lock-in.** One uninstall command and your machine is back to how it was.
+
+## CoderPad assessments (coderpad-prime)
+
+**coderpad-prime** is cursor-prime adapted for CoderPad: see [`CoderPad-Prime/`](CoderPad-Prime/) (`SKILL.md`, `DISCIPLINE.md`, `MAINTAINABILITY.md`, `NOTES.template.md`). Upload that folder into the pad; formal write-up is **`NOTES.md` at the assessment project root**. Candidate guide: [`How to use CoderPad-Prime.md`](How%20to%20use%20CoderPad-Prime.md) (Chinese; do not upload). Includes Plan Gate, light loop, Karpathy discipline, and maintainability — without Cursor slash commands.
 
 ## How Cursor differs from Kiro (important)
 
