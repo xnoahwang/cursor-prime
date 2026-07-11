@@ -25,8 +25,8 @@ When the user says something like *"read AGENTS.md and install cursor-prime"*, d
    - Installed global slash commands `/plan`, `/delta`, `/verify`, `/loop`, `/handoff`, `/submission-init` into `~/.cursor/commands/`.
    - Wrote `~/.gitignore_global` and set `git config --global core.excludesfile`.
    - Wrote a best-effort `~/.cursor/rules/behavior.mdc` (global; loading is version-dependent — do NOT rely on it).
-   - Wrote a paste-ready `~/.cursor-prime-user-rules.txt` (**Coding Behavior + Maintainability**, v0.2.6+) and copied the rule text to the clipboard.
-   - Wrote the manifest `~/.cursor-prime-manifest.json` (version 0.2.6).
+   - Wrote a paste-ready `~/.cursor-prime-user-rules.txt` (**Coding Behavior + Maintainability**, v0.3.0+) and copied the rule text to the clipboard.
+   - Wrote the manifest `~/.cursor-prime-manifest.json` (version 0.3.0).
    - Optional: with `-WithHooks`, installed `~/.cursor/hooks.json` and guard script.
    - Removed obsolete `~/.cursor/commands/prime-init.md` if present (per-project init retired).
 
@@ -96,7 +96,7 @@ Manifest stays `~/.cursor-prime-manifest.json` with the same shape. `git config 
 
 ## Verify
 
-- Run `install.ps1`; confirm `~/.cursor/commands/*.md` (including `submission-init.md`, **not** `prime-init.md`) exist and the manifest is version **0.2.6**.
+- Run `install.ps1`; confirm `~/.cursor/commands/*.md` (including `submission-init.md`, **not** `prime-init.md`) exist and the manifest is version **0.3.0**.
 - Confirm this repo has a single originals tree: `payload/` (no `home/`, no `templates/`, no `init.ps1`).
 - Open a Cursor chat after User Rules paste; ask for a non-trivial task; confirm `<plan>` and wait for `GO`.
 - Confirm `/loop` and `/handoff` appear; non-trivial tasks may auto-bootstrap `submission/` unless opted out.

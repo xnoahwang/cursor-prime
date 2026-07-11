@@ -74,10 +74,11 @@ After setup you get:
 
 ## Changelog
 
-### v0.2.6
-- **Global settings package** — single `payload/` originals tree; removed `init.ps1`, `/prime-init`, `home/`, and `templates/` stubs.
+### v0.3.0
+- **Major: global Cursor settings package** — single `payload/` originals tree; removed `init.ps1`, `/prime-init`, `home/`, and `templates/` stubs.
 - Deploy story only: clone → `install.ps1` → paste User Rules (all projects on the machine).
-- **No separate CoderPad guide** — interview write-up is covered by `payload/submission/` + Maintainability (same top-level design as everyday work).
+- **Submission + Maintainability** cover interview write-ups; no separate CoderPad guide or in-pad rule pack.
+- Standalone product narrative (no kiro-prime attribution).
 
 ### v0.2.5
 - **User Rules merge** — Coding Behavior + Maintainability in one paste.
@@ -176,7 +177,7 @@ git pull
 .\install.ps1 -Force
 ```
 
-Re-paste User Rules so they match **v0.2.6**.
+Re-paste User Rules so they match **v0.3.0**.
 
 ## Uninstall
 
