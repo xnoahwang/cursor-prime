@@ -112,6 +112,7 @@ install.ps1 / uninstall.ps1
 README.md / AGENTS.md / LICENSE
 ```
 
+Local-only (gitignored): `coderpad/` may hold personal assessment helpers such as `meta-instruction.md` — not part of the published package.
 ## Out of scope
 
 - Auto-writing Cursor User Rules (no file API; pasted manually).

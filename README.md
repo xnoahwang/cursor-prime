@@ -10,7 +10,7 @@ A **global Cursor settings package**: Karpathy-derived coding rules, a strict Pl
 - **Light loop discipline.** After `GO`, fix-and-retry with a hard verifier (test/lint/build), iteration cap, and `/loop` — session-only, not overnight automation.
 - **Karpathy discipline, automated.** Surgical changes, simplicity first, verifiable goals, terse output. No "Great! Let me also refactor this for you" sprawl.
 - **One machine setup.** Clone → `install.ps1` → paste into Settings → User Rules. No per-project init.
-- **Submission-ready.** Optional `submission/` trio (Handover / Reflection / Appendix) covers thought process, tradeoffs, and handoff — enough for interviews and everyday milestones.
+- **Submission-ready.** Optional `submission/` trio (Handover / Reflection / Appendix) for interviews and milestones. For timed pads, keep a local `coderpad/meta-instruction.md` (gitignored) and copy it into an empty project as the only starter file so the agent can guide step-by-step in Chinese.
 - **Zero lock-in.** One uninstall command and your machine is back to how it was (clear User Rules paste manually if you want a full reset).
 
 ## Repository layout (settings package)
