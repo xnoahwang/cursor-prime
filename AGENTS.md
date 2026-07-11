@@ -1,8 +1,3 @@
----
-description: 
-alwaysApply: true
----
-
 # AGENTS.md
 
 This file is for AI coding agents reading this repo to **install cursor-prime** (most common) or to adapt it to a different IDE/tool or OS.
