@@ -1,33 +1,46 @@
 ﻿# cursor-prime
 
-Cursor-native configuration: Karpathy-derived coding rules, a strict Plan Gate, Cursor slash commands, and a global `.gitignore`. Adapted from [kiro-prime](https://github.com/xnoahwang/kiro-prime) for Cursor's rules/commands ecosystem.
+A **global Cursor settings package**: Karpathy-derived coding rules, a strict Plan Gate, slash commands, and a global `.gitignore`. Install once on a machine; paste User Rules once; every project inherits them.
 
 ## Why use this?
 
 - **Save credits.** The agent plans before it codes, so you catch wrong directions *before* tokens are spent on wrong implementations.
 - **Honest reporting, not blind trust.** Every non-trivial task ends with a Delta Report (files changed, anything outside plan, verify output) so you can spot drift without reading every diff.
-- **Handoff-ready by default.** Project init installs maintainability rules plus `AGENTS.md` / `README` stubs so new code is documented for the next human and the next AI — tiered so one-line fixes stay cheap.
+- **Handoff-ready by default.** User Rules include maintainability standards so new code is documented for the next human and the next AI — tiered so one-line fixes stay cheap.
 - **Light loop discipline.** After `GO`, fix-and-retry with a hard verifier (test/lint/build), iteration cap, and `/loop` — session-only, not overnight automation.
 - **Karpathy discipline, automated.** Surgical changes, simplicity first, verifiable goals, terse output. No "Great! Let me also refactor this for you" sprawl.
-- **Cursor-native.** Uses `.cursor/rules/*.mdc` (always-applied), Cursor global slash commands, and `AGENTS.md`-compatible markdown — not a foreign format bolted on.
-- **Zero lock-in.** One uninstall command and your machine is back to how it was.
+- **One machine setup.** Clone → `install.ps1` → paste into Settings → User Rules. No per-project init.
+- **Submission-ready.** Optional `submission/` trio (Handover / Reflection / Appendix) covers thought process, tradeoffs, and handoff — enough for interviews and everyday milestones.
+- **Zero lock-in.** One uninstall command and your machine is back to how it was (clear User Rules paste manually if you want a full reset).
 
-## CoderPad assessments (coderpad-prime)
+## Repository layout (settings package)
 
-**coderpad-prime** is cursor-prime adapted for CoderPad: see [`CoderPad-Prime/`](CoderPad-Prime/) (`SKILL.md`, `DISCIPLINE.md`, `MAINTAINABILITY.md`, `NOTES.template.md`). Upload that folder into the pad; formal write-up is **`NOTES.md` at the assessment project root**. Candidate guide: [`How to use CoderPad-Prime.md`](How%20to%20use%20CoderPad-Prime.md) (Chinese; do not upload). Includes Plan Gate, light loop, Karpathy discipline, and maintainability — without Cursor slash commands.
+```
+cursor-prime/
+├── install.ps1 / uninstall.ps1
+├── payload/                         # ONLY originals
+│   ├── behavior.mdc / maintainability.mdc
+│   ├── gitignore_global
+│   ├── commands/                    # global slash commands
+│   ├── hooks/                       # optional -WithHooks
+│   └── submission/                  # Handover, Reflection, Appendix
+├── README.md / AGENTS.md / LICENSE
+```
 
-## How Cursor differs from Kiro (important)
+**Deploy:** `git clone` → `install.ps1` → paste User Rules once. Done for all projects on that machine.
 
-Kiro installs **one global file** and every project benefits. Cursor has **no reliable global rules file** — that's a [known limitation](https://forum.cursor.com/t/how-do-i-configure-a-global-rules-file-that-gets-picked-up-by-agent-mode/157335/3). So cursor-prime uses the mechanisms Cursor *does* support reliably:
+## Why a User Rules paste is required
+
+Cursor has **no reliable global rules file** — that's a [known limitation](https://forum.cursor.com/t/how-do-i-configure-a-global-rules-file-that-gets-picked-up-by-agent-mode/157335/3). So cursor-prime uses:
 
 | Mechanism | Scope | Set by | Reliability |
 |---|---|---|---|
-| `.cursor/rules/behavior.mdc` (`alwaysApply: true`) | per project | `init.ps1` | ✅ primary |
-| Global slash commands `~/.cursor/commands/*.md` | global | `install.ps1` | ✅ reliable |
 | User Rules (Settings → Rules) | global | manual paste | ✅ reliable (no file API) |
+| Global slash commands `~/.cursor/commands/*.md` | global | `install.ps1` | ✅ reliable |
 | `~/.cursor/rules/behavior.mdc` | global | `install.ps1` (best-effort) | ⚠️ version-dependent |
+| `~/.gitignore_global` | global | `install.ps1` | ✅ reliable |
 
-**Recommended setup:** run `install.ps1` once, then do its single manual step — paste the rules into **Settings → Rules → User Rules** (the installer copies them to your clipboard and saves a backup at `~/.cursor-prime-user-rules.txt`). That one paste makes the Plan Gate automatic in every project, including new ones. Run `init.ps1` / `/prime-init` in each repo for project-level files (`maintainability.mdc`, `project.mdc`, `AGENTS.md`, `README` stub, `progress.md`) so handoff standards live in-tree.
+**Recommended setup:** `git clone` → run `install.ps1` once → paste into **Settings → Rules → User Rules** (clipboard + `~/.cursor-prime-user-rules.txt`). That paste is **Coding Behavior + Maintainability**. Optional: `/submission-init` or auto-bootstrap for `submission/` docs.
 
 ## What it does
 
@@ -50,44 +63,40 @@ After setup you get:
 - **Session handoff** — `progress.md` Handoff and Loop State when pausing mid-task or mid-loop.
 
 **Cursor extras:**
-- **`/plan`** — force the Plan Gate on the current request (includes out-of-scope, done-when, max iterations, loop worthiness, pattern grounding).
-- **`/verify`** — on-demand audit against the plan and pre-flight list (includes hard-verifier check; no always-on token cost).
-- **`/loop`** — after `GO`, fix-and-retry until verify passes or iteration cap (requires hard gate in the plan).
+- **`/plan`** — force the Plan Gate on the current request.
+- **`/verify`** — on-demand audit against the plan and pre-flight list.
+- **`/loop`** — after `GO`, fix-and-retry until verify passes or iteration cap.
 - **`/handoff`** — raise the bar to tier D: public API docs, module headers, truthful `AGENTS.md` / `README` / `@project`.
 - **`/delta`** — produce a Delta Report for work just done.
-- **`/prime-init`** — scaffold the rules into the current project.
-- **Optional hooks** — `-WithHooks` on install/init asks before destructive shell commands (off by default).
+- **`/submission-init`** — scaffold `submission/` Handover / Reflection / Appendix trio.
+- **Optional hooks** — `-WithHooks` on install asks before destructive shell commands (off by default).
 - **Global gitignore** — `__pycache__`, `node_modules`, `.venv`, IDE/OS noise, Cursor caches.
 
 ## Changelog
 
+### v0.2.6
+- **Global settings package** — single `payload/` originals tree; removed `init.ps1`, `/prime-init`, `home/`, and `templates/` stubs.
+- Deploy story only: clone → `install.ps1` → paste User Rules (all projects on the machine).
+- **No separate CoderPad guide** — interview write-up is covered by `payload/submission/` + Maintainability (same top-level design as everyday work).
+
+### v0.2.5
+- **User Rules merge** — Coding Behavior + Maintainability in one paste.
+- **Submission auto-bootstrap** + `/submission-init`.
+
+### v0.2.4
+- **Submission trio** for assessments; removed in-pad rule pack.
+
 ### v0.2.3
-- **Maintainability (handoff-ready)** — always-applied `maintainability.mdc` via `init`: tiered docs/comments/layout so successors (humans and AIs) can continue the work.
-- **`/handoff`** — slash command for tier-D deliverables (interview handoff, milestones, ship quality).
-- **Greenfield pattern grounding** — `/plan` establishes conventions and writes them to `AGENTS.md` when none exist.
-- **Init scaffolds** — `AGENTS.md` + `README.md` stubs; `project.mdc` Documentation / Handoff section.
-- **`/verify`** — Maintainability audit line for tier C/D.
-- Behavior: new surfaces' docs are part of the deliverable (not scope creep); User Rules remain Plan Gate only — run `/prime-init` per project for in-tree handoff standards.
+- **Maintainability** + `/handoff`; greenfield pattern grounding.
 
 ### v0.2.2
-- **Loop discipline (light loop)** — session-only fix-and-retry after `GO`: iterate until verify PASS or max iterations (default 8); credit guard; loop-worthiness four-check on workflow-scale tasks.
-- **Hard verifier** — non-trivial tasks must *run* verify commands (test/lint/build/typecheck) before done; transcript required; no self-grade as sole proof.
-- **`/loop`** — global slash command for EXECUTE → VERIFY → ITERATE until `LOOP DONE` or `LOOP CAP`.
-- **Enhanced `/plan`** — Max iterations, loop worthiness (workflow-scale), verify as hard gate.
-- **Enhanced `/verify`** — Hard verifier audit line; suggests `/loop` when gate fails under cap.
-- **`progress.md`** — Loop State section for multi-iteration work.
-- **`project.mdc`** — Verify Commands documented as hard gates for plans and `/loop`.
+- **Light loop** + `/loop` + hard verifier.
 
 ### v0.2.1
-- **Stricter task class** — any file edit (including README, docs, markdown) is non-trivial; only read-only Q&A or a single-line typo in one known location skips Plan Gate.
-- Plan Gate now names Write / StrReplace / Delete explicitly; if the agent edits without a plan, it must stop and replan.
+- **Stricter task class** — any file edit is non-trivial.
 
 ### v0.2.0
-- **Discipline loop** — Task class, Explore cheap, Session continuity, Handoff in `progress.md`.
-- **`/verify`** — on-demand audit against plan and pre-flight file list.
-- **Enhanced `/plan`** — Out of scope, Done when, Scale, pattern grounding.
-- **Optional hooks** — `install.ps1 -WithHooks` / `init.ps1 -WithHooks` for destructive-shell guard (off by default).
-- **`project.mdc`** — verify commands and optional protected paths.
+- Discipline loop, `/verify`, enhanced `/plan`, optional hooks.
 
 ## Requirements
 
@@ -108,8 +117,6 @@ Read AGENTS.md in this repo and install cursor-prime by following its
 verify it, then tell me the single manual step I need to do.
 ```
 
-The agent runs the installer, verifies it, and ends by telling you the **one thing only you can do**: paste the rules into Cursor Settings → Rules → User Rules (the text is already on your clipboard). Everything else is automatic.
-
 ### Option 2 — Manual (PowerShell)
 
 ```powershell
@@ -118,145 +125,48 @@ cd $env:USERPROFILE\cursor-prime
 powershell -ExecutionPolicy Bypass -File .\install.ps1
 ```
 
-This installs the global slash commands, the global gitignore (+ `git config core.excludesfile`), and a best-effort `~/.cursor/rules/behavior.mdc`. It then **copies the rule text to your clipboard** (and saves a backup at `~/.cursor-prime-user-rules.txt`) so the one un-scriptable step is just: open **Cursor Settings → Rules → User Rules**, click the box, `Ctrl+V`, save. Do it once and the Plan Gate applies to every project, including new ones.
+This installs global slash commands, the global gitignore, and a best-effort `~/.cursor/rules/behavior.mdc`. It **copies User Rules text to your clipboard** (backup: `~/.cursor-prime-user-rules.txt`).
 
-Reinstall on top of an existing install: `.\install.ps1 -Force`
+Reinstall: `.\install.ps1 -Force`  
+Optional hooks: `.\install.ps1 -Force -WithHooks`
 
-Optional destructive-command guard (user-level hooks): `.\install.ps1 -Force -WithHooks`
-
-> **The single manual step (both options):** paste into Settings → Rules → User Rules. Cursor has no file/API to set User Rules, so no script can do it for you. It takes ~10 seconds, once per machine.
-
-## Initialize a project (primary mechanism)
-
-Run inside any project to make the Plan Gate apply there reliably:
-
-```powershell
-cd path\to\your\project
-& "$env:USERPROFILE\cursor-prime\init.ps1"
-```
-
-Creates:
-
-| File | Purpose |
-|------|---------|
-| `.cursor\rules\behavior.mdc` | Always-applied Plan Gate + Karpathy rules |
-| `.cursor\rules\maintainability.mdc` | Always-applied handoff standards (docs, comments, layout; tiered) |
-| `.cursor\rules\project.mdc` | Project context (tech stack / commands / verify / protected paths / docs), pulled in when relevant |
-| `AGENTS.md` | Successor map — layout, conventions, how to verify |
-| `README.md` | How to run / test (skipped if a README already exists) |
-| `progress.md` | Working log with Handoff and Loop State for session / loop resume |
-| `.gitignore` | Project-specific ignores (secrets, runtime data, Cursor caches) |
-| `.cursor\hooks\*` | Optional (`-WithHooks`): asks before destructive shell commands |
-
-Existing files are never overwritten without `-Force` (which backs them up to `.bak.<timestamp>` first).
-
-Project hooks: `& "$env:USERPROFILE\cursor-prime\init.ps1" -WithHooks`
-
-Or, from inside a Cursor chat, just run the `/prime-init` command.
+> **The single manual step:** paste into Settings → Rules → User Rules. Cursor has no file/API for User Rules. ~10 seconds, once per machine.
 
 ## Testing
 
-Use these checks after install (and the User Rules paste) or after `init.ps1` in a project. Start a **new chat** so rules load cleanly.
+After install + User Rules paste, start a **new chat**.
 
 ### Plan Gate (non-trivial task)
 
-Ask for something that clearly needs code, for example:
+Ask for something that clearly needs code. **Pass:** `<plan>` then wait for `GO`. Reply `GO` → implement + Delta Report.
 
-> Write a Python CLI that downloads a URL and prints all `<a>` links grouped by domain.
+### Trivial task
 
-**Pass:** the agent replies with a `<plan>` block (pre-flight file list, Out of scope, Done when) and **stops** — no file edits, no implementation yet.
-
-Reply with the literal word `GO`. **Pass:** the agent then implements and ends with a Delta Report.
-
-**Fail:** the agent writes or edits files before you say `GO` → rules are not active in this chat (see troubleshooting below).
-
-### Trivial task (should skip the gate)
-
-Ask a read-only question, e.g. *What does the Plan Gate section in behavior.mdc require?*
-
-**Pass:** a direct answer, no `<plan>` block and no wait for `GO`.
-
-### Documentation edit (non-trivial — v0.2.1+)
-
-Ask to change a doc file, for example:
-
-> Add a short "Testing" section to README explaining how to verify Plan Gate.
-
-**Pass:** `<plan>` with pre-flight file list (e.g. `README.md`), Out of scope, Done when — then **wait for `GO`** before editing.
-
-**Fail:** the agent edits README or other docs immediately. Re-paste User Rules from `~/.cursor-prime-user-rules.txt` after `install.ps1 -Force`.
-
-### Force the gate
-
-Type `/plan` before a request (or run `/plan` alone) to treat the task as non-trivial even if the model might classify it as trivial.
-
-### Audit after work
-
-After you reply `GO` and the agent finishes, run `/verify` to check the diff against the plan and pre-flight list. Use `/delta` if you only need the end-of-task summary.
-
-### Hard verifier
-
-Fill **Verify Commands** in `.cursor/rules/project.mdc` (e.g. test, lint). After `GO`, the agent should run those commands and paste output in the Delta Report.
-
-**Pass:** Delta Report includes a real command and transcript, not "tested and works".
-
-**Fail:** claims done without running verify when a hard gate exists.
-
-### Light loop (`/loop`)
-
-Use after a plan with verify commands and `GO`. If verify fails, send `/loop` (or let the agent iterate per Loop Discipline).
-
-**Pass:** `ITERATING (n/max)` → fixes one failure per pass → `LOOP DONE` when verify passes, or `LOOP CAP` at max iterations with a summary.
-
-**Fail:** retries without running verify, or continues past the cap silently.
-
-Quick smoke test (any project with `project.mdc` verify commands):
-
-```
-/plan
-Goal: add one line to progress.md Completed: "loop test".
-Verify: <your test or lint command from project.mdc>
-Max iterations: 3
-```
-
-Reply `GO`. If verify fails, run `/loop`.
-
-### Handoff quality (`/handoff`)
-
-For milestones, interview deliverables, or “make this successor-ready”, run `/handoff` (before or after planning).
-
-**Pass:** Done when includes public API docs, module headers, and truthful `AGENTS.md` / `README` / `@project`; Delta Report has `Maintainability: PASS`.
-
-**Fail:** feature works but new public APIs lack docstrings, or greenfield conventions were never written down.
+Ask a read-only question. **Pass:** direct answer, no wait for `GO`.
 
 ### Troubleshooting
 
 | Symptom | Likely cause |
 |---|---|
-| Code before `GO` on non-trivial tasks | User Rules not pasted, or project missing `.cursor/rules/behavior.mdc` |
-| Rules seem ignored | Old chat — open a new one; confirm frontmatter has `alwaysApply: true` |
-| Gate works in one project only | You ran `init.ps1` there but skipped the global User Rules paste |
-
-Confirm the file exists: `.cursor/rules/behavior.mdc` with `alwaysApply: true` in its YAML frontmatter.
+| Code before `GO` on non-trivial tasks | User Rules not pasted, or old chat — open a new one |
+| Rules seem ignored | Re-paste from `~/.cursor-prime-user-rules.txt`; new chat |
 
 ## What it changes on your machine
 
-`install.ps1` touches only:
-
 | Path | Source |
 |------|--------|
-| `~/.cursor/commands/*.md` | `home/.cursor/commands/*.md` |
-| `~/.cursor/rules/behavior.mdc` | `templates/behavior.mdc` (best-effort) |
-| `~/.cursor/hooks.json` + `~/.cursor/hooks/*` | `home/.cursor/hooks/*` (only with `-WithHooks`) |
-| `~/.gitignore_global` | `home/.gitignore_global` |
-| `~/.cursor-prime-user-rules.txt` | generated from `templates/behavior.mdc` (paste-ready User Rules) |
+| `~/.cursor/commands/*.md` | `payload/commands/*.md` |
+| `~/.cursor/rules/behavior.mdc` | `payload/behavior.mdc` (best-effort) |
+| `~/.cursor/hooks.json` + hooks script | `payload/hooks/*` (only with `-WithHooks`) |
+| `~/.gitignore_global` | `payload/gitignore_global` |
+| `~/.cursor-prime-user-rules.txt` | generated from `payload/behavior.mdc` + `maintainability.mdc` |
 | `git config --global core.excludesfile` | set to `~/.gitignore_global` |
 
-A manifest at `~/.cursor-prime-manifest.json` records what was installed so uninstall is precise. `init.ps1` only writes inside the project folder you run it from.
+Manifest: `~/.cursor-prime-manifest.json`.
 
 ## Customize
 
-Edit `templates/behavior.mdc` (the canonical rule), then re-run `init.ps1 -Force` in your projects and/or `install.ps1 -Force` for the global copy. Add more global commands by dropping `.md` files into `home/.cursor/commands/` and re-running `install.ps1 -Force`.
+Edit files under `payload/`, then `.\install.ps1 -Force` and re-paste User Rules.
 
 ## Update
 
@@ -266,7 +176,7 @@ git pull
 .\install.ps1 -Force
 ```
 
-Re-paste User Rules from `~/.cursor-prime-user-rules.txt` (or the installer clipboard) so global rules match v0.2.3. Re-run `init.ps1 -Force` in projects that need the new `maintainability.mdc` / `AGENTS.md` scaffolds (backs up existing files first).
+Re-paste User Rules so they match **v0.2.6**.
 
 ## Uninstall
 
@@ -275,20 +185,18 @@ cd $env:USERPROFILE\cursor-prime
 .\uninstall.ps1
 ```
 
-Removes only the files in the manifest (global commands, global rule, global gitignore) and restores `core.excludesfile`. To also restore pre-install backups: `.\uninstall.ps1 -RestoreBackups`. Per-project files from `init.ps1` are yours — delete them manually.
+Removes manifest-listed files and restores `core.excludesfile`. Clear User Rules in Settings manually if desired. `-RestoreBackups` restores install-time backups.
 
 ## Safety
 
-- `install.ps1` backs up existing files at install paths as `<file>.bak.<timestamp>`.
-- `uninstall.ps1` touches only files listed in `~/.cursor-prime-manifest.json`.
-- If you had `core.excludesfile` set before install, uninstall restores it; otherwise it unsets the key.
-- `init.ps1` never overwrites without `-Force`.
+- `install.ps1` backs up existing files as `<file>.bak.<timestamp>`.
+- `uninstall.ps1` touches only files listed in the manifest.
 - Scripts are short. Read them before running.
 
 ## Adapt for other tools / OSes
 
-See [AGENTS.md](AGENTS.md) for the procedure an AI agent follows to retarget this to another tool or port the installer to macOS / Linux.
+See [AGENTS.md](AGENTS.md).
 
 ## License
 
-MIT — see [LICENSE](LICENSE). Adapted from kiro-prime.
+MIT — see [LICENSE](LICENSE).

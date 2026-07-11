@@ -5,13 +5,14 @@
 
 .DESCRIPTION
     Reads ~/.cursor-prime-manifest.json (written by install.ps1) and removes
-    the files it installed (global commands, the global behavior rule, and the
-    global gitignore). Restores the previous git core.excludesfile value, or
-    unsets it if there was none. Backups created at install time are NOT
-    touched unless -RestoreBackups is passed.
+    the files it installed (global commands, the best-effort global behavior
+    rule, User Rules backup text, and the global gitignore). Restores the
+    previous git core.excludesfile value, or unsets it if there was none.
+    Backups created at install time are NOT touched unless -RestoreBackups
+    is passed.
 
-    This does NOT remove per-project files created by init.ps1 — those are
-    plain project files you own; delete them like any other file.
+    Does not clear Cursor Settings -> User Rules (no file API); remove that
+    paste manually if you want a full reset.
 
 .PARAMETER RestoreBackups
     For each removed file, if a .bak.<timestamp> exists from install,
@@ -59,7 +60,6 @@ foreach ($f in $manifest.files) {
     }
 }
 
-# Restore git config
 $key      = $manifest.git_config.key
 $ourValue = $manifest.git_config.set_to
 $prevVal  = $manifest.git_config.previous

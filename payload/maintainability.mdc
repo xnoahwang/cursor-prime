@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Maintainability (handoff-ready)
 
-Code must run **and** be readable by the next human and the next AI. These rules are always on for this project. Intensity is **tiered** so small fixes stay cheap.
+Code must run **and** be readable by the next human and the next AI. These standards ship in **global User Rules** (via `install.ps1`, merged after Coding Behavior). Intensity is **tiered** so small fixes stay cheap.
 
 ## Intensity tiers
 
@@ -16,7 +16,7 @@ Apply the matching tier; do not over-document trivial work.
 | **A — Trivial** | Read-only Q&A, or single-line typo in one known place | No extra docs |
 | **B — Edit existing** | Change files that already exist; no new public API | Surgical only; update docs **only** if behavior/layout/conventions changed and that update is on the pre-flight list |
 | **C — New surface** | New file, new module, or new public function/CLI/endpoint | Full checklist below for everything you add |
-| **D — Milestone / `/handoff`** | User ran `/handoff`, or task is explicitly “ship / hand off / interview deliverable” | Full checklist + refresh `README.md` / `AGENTS.md` / `@project` as needed |
+| **D — Milestone / `/handoff` / assessment** | User ran `/handoff`, interview/CoderPad deliverable, or explicit ship/hand off | Full checklist + refresh `README.md` / `AGENTS.md` / `@project` as needed + keep **`submission/`** trio growing (see Coding Behavior → Submission docs) |
 
 **Not scope creep:** For tier C/D, module headers, public API docs, and entry docs (`README.md`, `AGENTS.md`) are part of the deliverable — even if the user only named the feature.
 
@@ -78,12 +78,14 @@ For tier C/D non-trivial tasks, the task is incomplete until:
 - [ ] New modules have file headers
 - [ ] Layout matches stated conventions (or conventions were written in `AGENTS.md`)
 - [ ] `README.md` / `AGENTS.md` / `@project` reflect any new entry points, commands, or verify steps you added
+- [ ] `submission/` trio updated when that bootstrap applies (unless user opted out)
 - [ ] A successor could find “where to start” and “how to verify” without chatting with you
 
 Tier A/B: skip the checklist unless docs became wrong because of your change.
 
 ## Relationship to Plan Gate / Surgical Changes
 
-- Plan Gate, pre-flight lists, and verify receipts still apply (`behavior.mdc`).
+- Plan Gate, pre-flight lists, and verify receipts still apply (Coding Behavior / `behavior.mdc`).
 - Surgical Changes still apply to **existing** code you were not asked to reformat.
 - Maintainability requirements for **new** surfaces override “only what was asked” when “what was asked” implies shippable code.
+- Global User Rules may already include this entire Maintainability section — do not wait for an in-repo `maintainability.mdc` to apply these standards.

@@ -1,20 +1,19 @@
 #Requires -Version 5.1
 <#
 .SYNOPSIS
-    Install cursor-prime: Cursor global commands, a best-effort global
-    behavior rule, and a global gitignore.
+    Install cursor-prime: a global Cursor settings package.
 
 .DESCRIPTION
-    Copies files from this repo into the user profile:
-      - home\.cursor\commands\*.md   -> ~/.cursor/commands/   (Cursor global slash commands; reliable)
-      - templates\behavior.mdc       -> ~/.cursor/rules/behavior.mdc (best-effort global rule; see note)
-      - home\.gitignore_global       -> ~/.gitignore_global   (+ git config core.excludesfile)
-      - home\.cursor\hooks\*         -> ~/.cursor/hooks/      (optional; -WithHooks)
+    Copies payload originals into the user profile:
+      - payload\commands\*.md     -> ~/.cursor/commands/   (global slash commands)
+      - payload\behavior.mdc      -> ~/.cursor/rules/behavior.mdc (best-effort; see note)
+      - payload\gitignore_global  -> ~/.gitignore_global   (+ git config core.excludesfile)
+      - payload\hooks\*           -> ~/.cursor/hooks/      (optional; -WithHooks)
 
-    Cursor's true global "User Rules" live in Settings -> Rules and are stored
-    inside Cursor (cloud-synced), so they CANNOT be installed from a file.
-    This script prints the rule text at the end so you can paste it once.
-    For per-project enforcement, use init.ps1 instead (writes .cursor/rules/*.mdc).
+    Builds paste-ready User Rules (Coding Behavior + Maintainability) from
+    payload\behavior.mdc and payload\maintainability.mdc onto the clipboard
+    and ~/.cursor-prime-user-rules.txt. Cursor has no file API for User Rules —
+    paste once into Settings -> Rules -> User Rules; then every project inherits them.
 
     Existing files are backed up to <file>.bak.<timestamp>. A manifest at
     ~/.cursor-prime-manifest.json records what was installed so uninstall.ps1
@@ -25,7 +24,7 @@
 
 .PARAMETER WithHooks
     Install optional user-level hooks (~/.cursor/hooks.json) that ask before
-    destructive shell commands. Default: off (zero extra dependencies).
+    destructive shell commands. Default: off.
 
 .EXAMPLE
     .\install.ps1
@@ -76,27 +75,25 @@ function Install-FilePair {
     $InstalledList.Value += [pscustomobject]@{ path = $DstAbs; backup = $backup }
 }
 
-# (source-relative-to-repo, destination-absolute) pairs.
 $Files = @(
-    @{ Src = 'templates\behavior.mdc'; Dst = Join-Path $HomeDir '.cursor\rules\behavior.mdc' }
-    @{ Src = 'home\.gitignore_global'; Dst = Join-Path $HomeDir '.gitignore_global'          }
+    @{ Src = 'payload\behavior.mdc';     Dst = Join-Path $HomeDir '.cursor\rules\behavior.mdc' }
+    @{ Src = 'payload\gitignore_global'; Dst = Join-Path $HomeDir '.gitignore_global'          }
 )
 
-# Add every global command in home\.cursor\commands\*.md
-$cmdSrcDir = Join-Path $Repo 'home\.cursor\commands'
+$cmdSrcDir = Join-Path $Repo 'payload\commands'
 if (Test-Path $cmdSrcDir) {
     Get-ChildItem -Path $cmdSrcDir -Filter '*.md' -File | ForEach-Object {
         $Files += @{
-            Src = "home\.cursor\commands\$($_.Name)"
+            Src = "payload\commands\$($_.Name)"
             Dst = Join-Path $HomeDir ".cursor\commands\$($_.Name)"
         }
     }
 }
 
 if ($WithHooks) {
-    $Files += @{ Src = 'home\.cursor\hooks\hooks.json'; Dst = Join-Path $HomeDir '.cursor\hooks.json' }
+    $Files += @{ Src = 'payload\hooks\hooks.json'; Dst = Join-Path $HomeDir '.cursor\hooks.json' }
     $Files += @{
-        Src = 'home\.cursor\hooks\guard-destructive.ps1'
+        Src = 'payload\hooks\guard-destructive.ps1'
         Dst = Join-Path $HomeDir '.cursor\hooks\guard-destructive.ps1'
     }
 }
@@ -107,7 +104,6 @@ if ((Test-Path $ManifestPath) -and -not $Force) {
     exit 1
 }
 
-# Validate all sources before touching anything
 foreach ($f in $Files) {
     $src = Join-Path $Repo $f.Src
     if (-not (Test-Path $src)) { throw "Source missing: $src" }
@@ -119,7 +115,13 @@ foreach ($f in $Files) {
     Install-FilePair -SrcRel $f.Src -DstAbs $f.Dst -InstalledList ([ref]$installedFiles)
 }
 
-# Capture and update git core.excludesfile
+# Drop retired per-project init command if a previous install left it behind
+$obsoletePrimeInit = Join-Path $HomeDir '.cursor\commands\prime-init.md'
+if (Test-Path $obsoletePrimeInit) {
+    Remove-Item $obsoletePrimeInit -Force
+    Log "Removed obsolete: $obsoletePrimeInit"
+}
+
 $prevExcludes = git config --global --get core.excludesfile 2>$null
 if (-not $prevExcludes) { $prevExcludes = $null }
 
@@ -127,21 +129,33 @@ $gitignoreGlobal = Join-Path $HomeDir '.gitignore_global'
 git config --global core.excludesfile $gitignoreGlobal
 Log "git config --global core.excludesfile = $gitignoreGlobal"
 
-# Build the User Rules text: behavior.mdc with its leading --- frontmatter block removed
-$behaviorPath  = Join-Path $Repo 'templates\behavior.mdc'
-$behaviorLines = Get-Content $behaviorPath -Encoding UTF8
-$bodyLines     = $behaviorLines
-if ($behaviorLines.Count -gt 0 -and $behaviorLines[0].Trim() -eq '---') {
-    for ($i = 1; $i -lt $behaviorLines.Count; $i++) {
-        if ($behaviorLines[$i].Trim() -eq '---') {
-            $bodyLines = $behaviorLines[($i + 1)..($behaviorLines.Count - 1)]
-            break
+function Get-MdcBody([string]$Path) {
+    $lines = Get-Content $Path -Encoding UTF8
+    if ($lines.Count -gt 0 -and $lines[0].Trim() -eq '---') {
+        for ($i = 1; $i -lt $lines.Count; $i++) {
+            if ($lines[$i].Trim() -eq '---') {
+                if ($i + 1 -le $lines.Count - 1) {
+                    return ($lines[($i + 1)..($lines.Count - 1)] -join "`r`n").Trim()
+                }
+                return ''
+            }
         }
     }
+    return ($lines -join "`r`n").Trim()
 }
-$userRulesText = ($bodyLines -join "`r`n").Trim()
 
-# Save a paste-ready copy and try to put it on the clipboard
+$behaviorPath = Join-Path $Repo 'payload\behavior.mdc'
+$maintPath    = Join-Path $Repo 'payload\maintainability.mdc'
+$behaviorBody = Get-MdcBody $behaviorPath
+$maintBody    = Get-MdcBody $maintPath
+$userRulesText = @"
+$behaviorBody
+
+---
+
+$maintBody
+"@.Trim()
+
 $userRulesFile = Join-Path $HomeDir '.cursor-prime-user-rules.txt'
 Set-Content -Path $userRulesFile -Value $userRulesText -Encoding UTF8
 $installedFiles += [pscustomobject]@{ path = $userRulesFile; backup = $null }
@@ -149,10 +163,9 @@ $installedFiles += [pscustomobject]@{ path = $userRulesFile; backup = $null }
 $clipOk = $false
 try { Set-Clipboard -Value $userRulesText -ErrorAction Stop; $clipOk = $true } catch { $clipOk = $false }
 
-# Write manifest
 $manifest = [pscustomobject]@{
     name         = 'cursor-prime'
-    version      = '0.2.3'
+    version      = '0.2.6'
     installed_at = (Get-Date).ToString('o')
     with_hooks   = [bool]$WithHooks
     files        = $installedFiles
@@ -167,7 +180,7 @@ $manifest | ConvertTo-Json -Depth 6 | Set-Content -Path $ManifestPath -Encoding 
 Log "Manifest: $ManifestPath"
 
 Write-Host ""
-Log "Global slash commands installed: /plan, /delta, /verify, /loop, /prime-init (open the command menu to use them)."
+Log "Global slash commands installed: /plan, /delta, /verify, /loop, /handoff, /submission-init (open the command menu to use them)."
 if ($WithHooks) {
     Log "User hooks installed (~/.cursor/hooks.json). Restart Cursor if hooks do not load immediately."
 } else {
@@ -176,12 +189,12 @@ if ($WithHooks) {
 Write-Host ""
 Warn "ONE manual step makes the rules global + automatic (Cursor has no file API for User Rules):"
 if ($clipOk) {
-    Warn "  The rule text is ALREADY ON YOUR CLIPBOARD."
+    Warn "  User Rules text (Behavior + Maintainability) is ALREADY ON YOUR CLIPBOARD."
     Warn "  1) Open Cursor Settings -> Rules -> User Rules"
     Warn "  2) Click the box, press Ctrl+V, then save."
+    Warn "  Done once = applies to every project, including new ones. (Backup: $userRulesFile)"
 } else {
     Warn "  Open this file and copy all of it, then paste into Settings -> Rules -> User Rules:"
-    Warn "    $userRulesFile"
+    Warn "  $userRulesFile"
 }
-Warn "  Done once = applies to every project, including new ones. (Backup copy: $userRulesFile)"
 Log "Done."

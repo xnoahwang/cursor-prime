@@ -1,5 +1,5 @@
 ---
-description: 
+description: Plan Gate + Karpathy discipline rules (Plan Gate, Surgical Changes, Verify Receipt, Delta Report)
 alwaysApply: true
 ---
 
@@ -140,9 +140,23 @@ When pausing a non-trivial task, update `progress.md` **Handoff** (plan status, 
 - Standard naming. No `var1`, `tmp2`. Isolate Logic / IO / Action.
 - Prefer conventions already in the repo; if none exist (greenfield), establish them and write them into `AGENTS.md` (and `@project` when the stack is fixed) — do not leave an undocumented one-off style.
 
-## Persistence (auto-bootstrap; no per-project setup needed)
+## Persistence (global settings package — no per-project install)
+- **Global User Rules** (from `install.ps1`) include **Coding Behavior + Maintainability** so every project gets Plan Gate, Karpathy discipline, and handoff comment/layout standards after one paste into Cursor Settings.
 - `progress.md` is the working log. If it does not exist, create it at the project root the first time you complete a milestone, using this structure: Current Focus / Completed / Next Steps / Known Issues / Handoff. Update it after each milestone or before pausing a task.
 - `.cursor/rules/project.mdc` holds project context (tech stack, key paths, commands, verify commands, optional protected paths). Create or update it once stack decisions are finalized — don't create an empty placeholder preemptively.
-- `.cursor/rules/maintainability.mdc` (when present via `init`) is always-applied handoff standards — docs, comments, layout. Honor its intensity tiers.
 - `AGENTS.md` / `README.md` are the successor entry points; keep them truthful when you add run paths, layout, or verify steps.
 - Do NOT auto-create `.gitignore`; the user's global gitignore already covers common noise (node_modules, .venv, __pycache__, Cursor caches). Add project-specific ignores only when asked.
+
+## Submission docs (auto-bootstrap — strategy A)
+
+Default for **non-trivial** work in any project (interview or not):
+
+1. **Detect** whether `submission/` exists at the project root with `1. Handover.md`, `2. Reflection.md`, and `3. Appendix.md`.
+2. **If missing:** create `submission/` and copy those three files from the local cursor-prime clone:
+   - Prefer `$env:USERPROFILE\cursor-prime\payload\submission\*.md` (Windows) or the user’s known clone path (e.g. `C:\XW\cursor-prime\payload\submission\`).
+   - If the clone cannot be found, create the three files using the same Title Case structure as cursor-prime’s payload templates (Handover / Reflection / Appendix) rather than skipping.
+3. **Grow** the three docs during the task: update after meaningful decisions, before verify/done, and when the pre-flight file list changes (especially Appendix sync checklist). English body; Title Case headings.
+4. **Opt-out:** if the user says not to use submission / skip handover docs / no submission for this project, do **not** create or update `submission/` for that task (note the opt-out in the plan Out of scope).
+5. List `submission/*` on the pre-flight file list when you will create or edit them.
+
+`/submission-init` forces scaffold even on an otherwise trivial request.
