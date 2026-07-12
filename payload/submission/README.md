@@ -4,9 +4,9 @@ Copy this folder into a project as **`submission/`**, then fill the three files 
 
 | # | File | Role |
 |---|------|------|
-| 1 | `1. Handover.md` | Newcomer map — run, architecture, where to edit, verify (**final** design) |
-| 2 | `2. Reflection.md` | Judgment — thought process, hard/easy, **abandoned approaches** |
-| 3 | `3. Appendix.md` | Process — workflow notes, **final** paste-back file list |
+| 1 | `1. Handover.md` | Newcomer map — run, architecture, **What We Changed**, where to edit, verify |
+| 2 | `2. Reflection.md` | Judgment — thought process, hard/easy, **abandoned approaches**, Iteration Log |
+| 3 | `3. Appendix.md` | Process — workflow notes, **changed-files-only** paste-back list with what changed |
 
 **Timed assessment:** keep `meta-instruction.md` under your local gitignored `coderpad/` folder (not shipped in git). New empty project → copy that file to the project root as the **only** starter file → ask the agent to read it and guide in Chinese, one step at a time.
 
@@ -33,4 +33,4 @@ Adjust paths if your clone lives elsewhere. You can copy `submission/` later whe
 
 ## Grow as you work
 
-All three files grow during the task. Keep Reflection **Iteration Log** (v1 MVP → later waves) updated after every verified wave. Log rejected approaches as soon as you switch. Security: deliver if the prompt requires it; otherwise note “considered” in §8.1. Performance: think always; ship small proven opts; defer big speculative work to §8.2. Keep the Appendix sync checklist as the **final** paste-back list (exclude `meta-instruction.md`).
+All three files grow during the task. Keep Reflection **Iteration Log** (v1 MVP → later waves) updated after every verified wave. Log rejected approaches as soon as you switch. Security: deliver if the prompt requires it; otherwise note “considered” in §8.1. Performance: think always; ship small proven opts; defer big speculative work to §8.2. **Paste-back:** only changed files + `submission/`; Appendix/Handover must state **what specifically changed** (not path alone); keep inline why-comments. Exclude `meta-instruction.md`.
