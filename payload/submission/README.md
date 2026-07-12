@@ -33,4 +33,4 @@ Adjust paths if your clone lives elsewhere. You can copy `submission/` later whe
 
 ## Grow as you work
 
-All three files grow during the task. Log rejected approaches in Reflection as soon as you switch. Security: deliver if the prompt requires it; otherwise note “considered” in Reflection §8.1. Performance: think always; ship small proven opts; defer big speculative work to Reflection §8.2. Keep the Appendix sync checklist as the **final** paste-back list (exclude `meta-instruction.md`).
+All three files grow during the task. Keep Reflection **Iteration Log** (v1 MVP → later waves) updated after every verified wave. Log rejected approaches as soon as you switch. Security: deliver if the prompt requires it; otherwise note “considered” in §8.1. Performance: think always; ship small proven opts; defer big speculative work to §8.2. Keep the Appendix sync checklist as the **final** paste-back list (exclude `meta-instruction.md`).
