@@ -18,6 +18,7 @@ If there is no plan or pre-flight file list in this conversation, say so and sto
 5. **Surgical** — adjacent code, comments, or formatting touched without request? (New-file headers/docs required by maintainability do not count as surgical violations.)
 6. **Protected paths** — if `@project` defines protected paths, were any edited without being on the pre-flight list?
 7. **Maintainability** — for plan tier C/D (or any new public API / new module): public API docs present; new module headers present; `AGENTS.md` / `README.md` / `@project` updated if entry points or conventions changed; greenfield conventions written down. Tier A/B: N/A unless docs were made wrong.
+8. **Step / spec compliance** — if the plan has a **Task breakdown**, for each step claimed done: was it finished, and did work stay inside that step’s paths/scope? FAIL on skipped steps presented as done, or drive-by edits outside the current/claimed steps.
 
 ## Output
 
@@ -30,6 +31,7 @@ Verify Report
 - Surgical: PASS | FAIL — <issues, if any>
 - Protected paths: PASS | N/A | FAIL — <issues, if any>
 - Maintainability: PASS | N/A | FAIL — <missing docs/headers/entry updates, if FAIL>
+- Step / spec compliance: PASS | N/A | FAIL — <skipped or drifted steps, if FAIL>
 ```
 
 Then one sentence: proceed to Delta, fix findings first, send `/loop` to iterate (if hard gate exists and under max iterations), send `/handoff` to raise the bar to tier D, or re-plan.

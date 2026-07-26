@@ -48,10 +48,12 @@ After setup you get:
 
 **Discipline (what the AI is told not to do):**
 - **Plan Gate** — the agent outputs a `<plan>` and waits for your `GO` before writing code on non-trivial tasks.
-- **Task class** — trivial tasks skip ceremony; workflow-scale tasks must be phased in the plan.
+- **Design check (optional)** — for fuzzy / greenfield / large work, refine design in short chunks before the implementation plan.
+- **Task class** — trivial tasks skip ceremony; workflow-scale tasks need a bite-sized task breakdown with per-step verify.
 - **Explore cheap** — search-first, read-minimal; the pre-flight file list bounds reads and writes.
 - **Surgical Changes** — don't touch adjacent code, comments, or formatting; every changed line traces to the request.
 - **Simplicity** — build only what was asked; no speculative abstractions.
+- **Systematic debugging** — reproduce → hypothesize → evidence → fix (also `/debug`).
 
 **Honest reporting (what the AI is told to produce):**
 - **Pre-flight File List** — every file the plan will touch is named; touching anything else mid-task forces a stop.
@@ -66,6 +68,7 @@ After setup you get:
 - **`/plan`** — force the Plan Gate on the current request.
 - **`/verify`** — on-demand audit against the plan and pre-flight list.
 - **`/loop`** — after `GO`, fix-and-retry until verify passes or iteration cap.
+- **`/debug`** — systematic debugging: reproduce → hypothesize → evidence → fix.
 - **`/handoff`** — raise the bar to tier D: public API docs, module headers, truthful `AGENTS.md` / `README` / `@project`.
 - **`/delta`** — produce a Delta Report for work just done.
 - **`/submission-init`** — scaffold `submission/` Handover / Reflection / Appendix trio.
@@ -73,6 +76,11 @@ After setup you get:
 - **Global gitignore** — `__pycache__`, `node_modules`, `.venv`, IDE/OS noise, Cursor caches.
 
 ## Changelog
+
+### v0.3.1
+- **Light absorb from [superpowers](https://github.com/obra/superpowers)-style process** (ideas only — not a fork): optional design check, workflow-scale task breakdown + step self-check, systematic debugging, `/debug`.
+- Still **not** absorbed: mandatory TDD-always, default multi-hour subagent runs, per-task git worktrees.
+- **Re-install + re-paste User Rules** required after upgrade (`install.ps1 -Force`).
 
 ### v0.3.0
 - **Major: global Cursor settings package** — single `payload/` originals tree; removed `init.ps1`, `/prime-init`, `home/`, and `templates/` stubs.
@@ -177,7 +185,7 @@ git pull
 .\install.ps1 -Force
 ```
 
-Re-paste User Rules so they match **v0.3.0**.
+Re-paste User Rules so they match **v0.3.1**.
 
 ## Uninstall
 

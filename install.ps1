@@ -165,7 +165,7 @@ try { Set-Clipboard -Value $userRulesText -ErrorAction Stop; $clipOk = $true } c
 
 $manifest = [pscustomobject]@{
     name         = 'cursor-prime'
-    version      = '0.3.0'
+    version      = '0.3.1'
     installed_at = (Get-Date).ToString('o')
     with_hooks   = [bool]$WithHooks
     files        = $installedFiles
@@ -180,7 +180,7 @@ $manifest | ConvertTo-Json -Depth 6 | Set-Content -Path $ManifestPath -Encoding 
 Log "Manifest: $ManifestPath"
 
 Write-Host ""
-Log "Global slash commands installed: /plan, /delta, /verify, /loop, /handoff, /submission-init (open the command menu to use them)."
+Log "Global slash commands installed: /plan, /delta, /verify, /loop, /handoff, /debug, /submission-init (open the command menu to use them)."
 if ($WithHooks) {
     Log "User hooks installed (~/.cursor/hooks.json). Restart Cursor if hooks do not load immediately."
 } else {

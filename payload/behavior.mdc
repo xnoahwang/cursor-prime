@@ -33,6 +33,16 @@ Reading files and answering questions does NOT require a plan. Exploration reads
 
 If you already started editing without a plan, STOP immediately, output the plan, and wait for `GO` before further edits.
 
+## Design check (optional)
+
+Before the implementation `<plan>`, when the request is **ambiguous**, **greenfield**, or clearly **workflow-scale**, briefly refine intent:
+
+1. Ask short clarifying questions only if needed (prefer one focused question).
+2. Present the design in **short chunks** the human can accept or correct.
+3. Then output the implementation `<plan>` and wait for `GO`.
+
+Skip when the user already gave a concrete approach, a file-level brief, or says to skip design. Note `Design notes: skipped` (or a one-line summary) inside the `<plan>` when useful. This does **not** replace Plan Gate.
+
 ## Explore Cheap
 
 Before editing, minimize context cost:
@@ -61,6 +71,23 @@ If during execution you discover you need to touch a file not on that list, **ST
 - Restate the task as a verifiable goal before coding.
 - Each completed block needs a verify step proving PASS/FAIL.
 - For new modules or public APIs, **Done when** must include the maintainability checklist in `maintainability.mdc` (tier C), or the full `/handoff` bar (tier D) when the user asked for handoff-quality delivery.
+
+## Bite-sized steps (workflow-scale)
+
+When **Scale** is `workflow-scale`, the `<plan>` must include a **Task breakdown**: an ordered list of small steps, each with target file paths and a verify / Done-when check. Prefer steps small enough to finish and check in one pass.
+
+During execution, after completing a breakdown step, do a quick two-stage self-check before the next step: (1) matches that step’s plan/spec, (2) no obvious regression or quality miss. Do not start a separate review ceremony unless the user asks. Stay inside the credit guard — no multi-hour unattended subagent runs.
+
+## Systematic debugging
+
+When hunting a bug (or the user runs `/debug`), before broad edits:
+
+1. **Reproduce** — exact failing command/symptom (or state what blocks repro).
+2. **Hypothesize** — one primary cause (and optional secondary).
+3. **Evidence** — smallest check that would confirm/reject (log, test, bisect read).
+4. **Fix** — only then change code; re-run the failing verify.
+
+Do not spray unrelated changes hoping the bug disappears. `/loop` still applies after a fix if verify fails.
 
 ## Verify Receipt
 When claiming verification, paste the exact command you ran and its exact output (or relevant tail).
