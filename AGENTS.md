@@ -17,22 +17,22 @@ When the user says something like *"read AGENTS.md and install cursor-prime"*, d
    - **macOS / Linux:** there is no `.sh` shipped yet. Port `install.ps1` → `install.sh` per the "OS adaptation" section below, run it, then keep the `.ps1` files in place.
 
 3. **Know what the installer did automatically (no user action needed):**
-   - Installed global slash commands `/plan`, `/delta`, `/verify`, `/loop`, `/handoff`, `/debug`, `/submission-init` into `~/.cursor/commands/`.
+   - Installed global slash commands `/plan`, `/delta`, `/verify`, `/loop`, `/handoff`, `/debug`, `/grill`, `/submission-init` into `~/.cursor/commands/`.
    - Wrote `~/.gitignore_global` and set `git config --global core.excludesfile`.
    - Wrote a best-effort `~/.cursor/rules/behavior.mdc` (global; loading is version-dependent — do NOT rely on it).
-   - Wrote a paste-ready `~/.cursor-prime-user-rules.txt` (**Coding Behavior + Maintainability**, v0.3.1+) and copied the rule text to the clipboard.
-   - Wrote the manifest `~/.cursor-prime-manifest.json` (version 0.3.1).
+   - Wrote a paste-ready `~/.cursor-prime-user-rules.txt` (**Coding Behavior + Maintainability**, v0.3.3+) and copied the rule text to the clipboard.
+   - Wrote the manifest `~/.cursor-prime-manifest.json` (version 0.3.3).
    - Optional: with `-WithHooks`, installed `~/.cursor/hooks.json` and guard script.
    - Removed obsolete `~/.cursor/commands/prime-init.md` if present (per-project init retired).
 
-4. **Verify.** Confirm `~/.cursor/commands/plan.md`, `delta.md`, `verify.md`, `loop.md`, `handoff.md`, `debug.md`, `submission-init.md`, and `~/.cursor-prime-manifest.json` exist. Report PASS/FAIL with the real paths checked. Confirm `prime-init.md` is absent.
+4. **Verify.** Confirm `~/.cursor/commands/plan.md`, `delta.md`, `verify.md`, `loop.md`, `handoff.md`, `debug.md`, `grill.md`, `submission-init.md`, and `~/.cursor-prime-manifest.json` exist. Report PASS/FAIL with the real paths checked. Confirm `prime-init.md` is absent.
 
 5. **Surface the ONE manual step — this is mandatory and you CANNOT do it for the user** (Cursor has no file/API write for User Rules). End your response with this as the single, highlighted action item:
    > **One manual step left.** The rules text is already on your clipboard (backup at `~/.cursor-prime-user-rules.txt`). Open **Cursor → Settings → Rules → User Rules**, click the box, press **Ctrl+V** (Cmd+V on macOS), and **Save**. Do this once and Plan Gate **plus Maintainability** apply automatically to every project, including new ones.
 
    If the clipboard may have been cleared (e.g. you ran the installer in a non-interactive shell), read `~/.cursor-prime-user-rules.txt` and show its contents so the user can copy it directly.
 
-6. **(Optional) Mention submission.** Non-trivial tasks may auto-bootstrap `submission/` from `payload/submission/`. `/submission-init` forces scaffold. User may opt out in the prompt.
+6. **(Optional) Mention submission.** `submission/` is **opt-in only** (not auto-created). User can run `/submission-init` or explicitly ask for handover/reflection/appendix docs. Default is inline why-comments.
 
 **Do NOT** claim the install alone makes the rules globally automatic. The User Rules paste in step 5 is required for that; without it, only the slash commands and gitignore are active.
 
@@ -91,10 +91,10 @@ Manifest stays `~/.cursor-prime-manifest.json` with the same shape. `git config 
 
 ## Verify
 
-- Run `install.ps1`; confirm `~/.cursor/commands/*.md` (including `debug.md`, `submission-init.md`, **not** `prime-init.md`) exist and the manifest is version **0.3.1**.
+- Run `install.ps1`; confirm `~/.cursor/commands/*.md` (including `debug.md`, `grill.md`, `submission-init.md`, **not** `prime-init.md`) exist and the manifest is version **0.3.3**.
 - Confirm this repo has a single originals tree: `payload/` (no `home/`, no `templates/`, no `init.ps1`).
 - Open a Cursor chat after User Rules paste; ask for a non-trivial task; confirm `<plan>` and wait for `GO`.
-- Confirm `/loop`, `/handoff`, and `/debug` appear; non-trivial tasks may auto-bootstrap `submission/` unless opted out.
+- Confirm `/loop`, `/handoff`, `/debug`, and `/grill` appear; `submission/` is **not** auto-created unless `/submission-init` or an explicit ask.
 
 ## What you should NOT do
 

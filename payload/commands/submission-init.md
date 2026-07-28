@@ -1,5 +1,7 @@
 # Submission init
 
+**Opt-in.** Global rules do **not** auto-create `submission/` anymore. Run this command (or explicitly ask for handover/reflection/appendix docs) when you want the trio.
+
 Scaffold (or refresh) the **`submission/`** trio in the **current project** so Handover / Reflection / Appendix can grow with the work.
 
 ## Create if missing
@@ -23,9 +25,9 @@ If `$env:USERPROFILE\cursor-prime` is missing, ask where cursor-prime lives, or 
 ## After scaffold
 
 - Fill/update in **English**; headings **Title Case**.
-- Grow during non-trivial work (Coding Behavior → Submission docs).
-- If the user opted out of submission for this project, stop and do not create files.
+- Grow during the rest of this task while submission is enabled (Coding Behavior → Submission docs, opt-in).
+- Prefer inline why-comments in code regardless; submission docs are extra when required.
 
 ## Note
 
-Global User Rules already tell the agent to auto-create `submission/` on non-trivial tasks when missing. This command **forces** scaffold on demand.
+Default day-to-day work uses **inline comments** only. This command is the explicit on-switch for the Handover / Reflection / Appendix templates.

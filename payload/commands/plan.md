@@ -7,9 +7,9 @@ Treat the request that follows (or the most recent request if none is given) as 
 Do NOT call Write, StrReplace, Delete, or any state-changing tool yet. Instead output a single `<plan>` block containing:
 
 - **Goal** — the task restated as one verifiable outcome.
-- **Design notes** — optional: short summary of design-check chunks the human accepted, or `skipped` (concrete brief already given / user skipped). Use when the request was ambiguous, greenfield, or workflow-scale.
+- **Design notes** — optional: `skipped` | `grilled: <one-line>` | short design-check summary. Use when the request was ambiguous, greenfield, workflow-scale, or after `/grill`.
 - **Approach** — the minimal steps; no speculative abstractions.
-- **Out of scope** — what you will explicitly NOT do (even if related or "nice to have"). Explicitly keep out: mandatory TDD-always, default multi-hour subagent runs, per-task git worktrees unless the user asks.
+- **Out of scope** — what you will explicitly NOT do (even if related or "nice to have"). Explicitly keep out: mandatory TDD-always, default multi-hour subagent runs, per-task git worktrees, issue-tracker triage / wayfinder suites, and vendoring whole third-party skill packs unless the user asks.
 - **Done when** — the verifiable stop condition; the task is incomplete until this is met. Must bind to executable verify command(s) when a hard gate exists (test, lint, build, typecheck). If the task adds new files or public APIs, also bind to the maintainability checklist in `maintainability.mdc` (tier C). If the user asked for handoff-quality delivery or ran `/handoff`, use tier D.
 - **Max iterations** — default `8` for fix-and-retry loops after `GO`; lower if the task is small or credit-sensitive.
 - **Scale** — `trivial` | `single-context` | `workflow-scale` (if workflow-scale, include phased steps and note token/credit cost).

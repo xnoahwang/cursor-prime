@@ -10,7 +10,7 @@ A **global Cursor settings package**: Karpathy-derived coding rules, a strict Pl
 - **Light loop discipline.** After `GO`, fix-and-retry with a hard verifier (test/lint/build), iteration cap, and `/loop` — session-only, not overnight automation.
 - **Karpathy discipline, automated.** Surgical changes, simplicity first, verifiable goals, terse output. No "Great! Let me also refactor this for you" sprawl.
 - **One machine setup.** Clone → `install.ps1` → paste into Settings → User Rules. No per-project init.
-- **Submission-ready.** Optional `submission/` trio (Handover / Reflection / Appendix) for interviews and milestones. For timed pads, keep a local `coderpad/meta-instruction.md` (gitignored) and copy it into an empty project as the only starter file so the agent can guide step-by-step in Chinese.
+- **Submission-ready (opt-in).** Templates for Handover / Reflection / Appendix live under `payload/submission/`. **Not** auto-created; use `/submission-init` or ask explicitly. Day-to-day: prefer **inline why-comments**. For timed pads, keep a local `coderpad/meta-instruction.md` (gitignored) when you want a Chinese step conductor.
 - **Zero lock-in.** One uninstall command and your machine is back to how it was (clear User Rules paste manually if you want a full reset).
 
 ## Repository layout (settings package)
@@ -40,7 +40,7 @@ Cursor has **no reliable global rules file** — that's a [known limitation](htt
 | `~/.cursor/rules/behavior.mdc` | global | `install.ps1` (best-effort) | ⚠️ version-dependent |
 | `~/.gitignore_global` | global | `install.ps1` | ✅ reliable |
 
-**Recommended setup:** `git clone` → run `install.ps1` once → paste into **Settings → Rules → User Rules** (clipboard + `~/.cursor-prime-user-rules.txt`). That paste is **Coding Behavior + Maintainability**. Optional: `/submission-init` or auto-bootstrap for `submission/` docs.
+**Recommended setup:** `git clone` → run `install.ps1` once → paste into **Settings → Rules → User Rules** (clipboard + `~/.cursor-prime-user-rules.txt`). That paste is **Coding Behavior + Maintainability**. Optional: `/submission-init` when you explicitly want the Handover / Reflection / Appendix trio.
 
 ## What it does
 
@@ -48,12 +48,13 @@ After setup you get:
 
 **Discipline (what the AI is told not to do):**
 - **Plan Gate** — the agent outputs a `<plan>` and waits for your `GO` before writing code on non-trivial tasks.
-- **Design check (optional)** — for fuzzy / greenfield / large work, refine design in short chunks before the implementation plan.
+- **Design check (optional)** — for fuzzy / greenfield / large work, refine design in short chunks (optional grill) before the implementation plan.
+- **Shared language (optional)** — long-lived repos may keep `CONTEXT.md` for domain jargon; `AGENTS.md` / `@project` stay layout and stack.
 - **Task class** — trivial tasks skip ceremony; workflow-scale tasks need a bite-sized task breakdown with per-step verify.
 - **Explore cheap** — search-first, read-minimal; the pre-flight file list bounds reads and writes.
 - **Surgical Changes** — don't touch adjacent code, comments, or formatting; every changed line traces to the request.
 - **Simplicity** — build only what was asked; no speculative abstractions.
-- **Systematic debugging** — reproduce → hypothesize → evidence → fix (also `/debug`).
+- **Systematic debugging** — reproduce → minimise → hypothesize → evidence → fix → regression check (also `/debug`).
 
 **Honest reporting (what the AI is told to produce):**
 - **Pre-flight File List** — every file the plan will touch is named; touching anything else mid-task forces a stop.
@@ -68,14 +69,24 @@ After setup you get:
 - **`/plan`** — force the Plan Gate on the current request.
 - **`/verify`** — on-demand audit against the plan and pre-flight list.
 - **`/loop`** — after `GO`, fix-and-retry until verify passes or iteration cap.
-- **`/debug`** — systematic debugging: reproduce → hypothesize → evidence → fix.
+- **`/debug`** — systematic debugging: reproduce → minimise → evidence → fix → regression check.
+- **`/grill`** — alignment grilling before planning; optional `CONTEXT.md` terms.
 - **`/handoff`** — raise the bar to tier D: public API docs, module headers, truthful `AGENTS.md` / `README` / `@project`.
 - **`/delta`** — produce a Delta Report for work just done.
-- **`/submission-init`** — scaffold `submission/` Handover / Reflection / Appendix trio.
+- **`/submission-init`** — **opt-in** scaffold for `submission/` Handover / Reflection / Appendix (off by default).
 - **Optional hooks** — `-WithHooks` on install asks before destructive shell commands (off by default).
 - **Global gitignore** — `__pycache__`, `node_modules`, `.venv`, IDE/OS noise, Cursor caches.
 
 ## Changelog
+
+### v0.3.3
+- **Submission is opt-in only** — no auto-bootstrap on non-trivial tasks; prefer inline why-comments. Enable via `/submission-init` or an explicit ask for submission/handover docs.
+- **Re-install + re-paste User Rules** required (`install.ps1 -Force`).
+
+### v0.3.2
+- **Light absorb from [mattpocock/skills](https://github.com/mattpocock/skills)** (ideas only): optional `/grill` alignment, optional `CONTEXT.md` shared language, richer debug loop (minimise / instrument / regression).
+- Still **not** absorbed: mandatory TDD, triage/wayfinder/issue-tracker suites, full skills.sh vendoring.
+- **Re-install + re-paste User Rules** required after upgrade (`install.ps1 -Force`).
 
 ### v0.3.1
 - **Light absorb from [superpowers](https://github.com/obra/superpowers)-style process** (ideas only — not a fork): optional design check, workflow-scale task breakdown + step self-check, systematic debugging, `/debug`.
@@ -185,7 +196,7 @@ git pull
 .\install.ps1 -Force
 ```
 
-Re-paste User Rules so they match **v0.3.1**.
+Re-paste User Rules so they match **v0.3.3**.
 
 ## Uninstall
 

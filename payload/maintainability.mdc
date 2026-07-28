@@ -16,7 +16,7 @@ Apply the matching tier; do not over-document trivial work.
 | **A — Trivial** | Read-only Q&A, or single-line typo in one known place | No extra docs |
 | **B — Edit existing** | Change files that already exist; no new public API | Surgical only; update docs **only** if behavior/layout/conventions changed and that update is on the pre-flight list |
 | **C — New surface** | New file, new module, or new public function/CLI/endpoint | Full checklist below for everything you add |
-| **D — Milestone / `/handoff` / assessment** | User ran `/handoff`, interview/CoderPad deliverable, or explicit ship/hand off | Full checklist + refresh `README.md` / `AGENTS.md` / `@project` as needed + keep **`submission/`** trio growing (see Coding Behavior → Submission docs) |
+| **D — Milestone / `/handoff` / assessment** | User ran `/handoff`, interview/CoderPad deliverable, or explicit ship/hand off | Full checklist + refresh `README.md` / `AGENTS.md` / `@project` as needed. **`submission/` trio only if** the user explicitly asked for those docs or ran `/submission-init` |
 
 **Not scope creep:** For tier C/D, module headers, public API docs, and entry docs (`README.md`, `AGENTS.md`) are part of the deliverable — even if the user only named the feature.
 
@@ -40,6 +40,7 @@ Every **new** source file that owns a concern gets a short file-level comment (a
 
 ## Comments (quality bar)
 
+- Default explanation for judgment is **inline why-comments** (and public API / file headers per tiers above) — not a separate `submission/` folder.
 - Write comments for **why**, tradeoffs, and non-obvious business rules.
 - Do **not** write comments that only restate the next line of code.
 - Do **not** leave commented-out dead code in the deliverable.
@@ -78,7 +79,7 @@ For tier C/D non-trivial tasks, the task is incomplete until:
 - [ ] New modules have file headers
 - [ ] Layout matches stated conventions (or conventions were written in `AGENTS.md`)
 - [ ] `README.md` / `AGENTS.md` / `@project` reflect any new entry points, commands, or verify steps you added
-- [ ] `submission/` trio updated when that bootstrap applies (unless user opted out)
+- [ ] `submission/` trio updated **only if** submission was explicitly enabled for this task (`/submission-init` or user request)
 - [ ] A successor could find “where to start” and “how to verify” without chatting with you
 
 Tier A/B: skip the checklist unless docs became wrong because of your change.

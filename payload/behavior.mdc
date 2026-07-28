@@ -37,11 +37,25 @@ If you already started editing without a plan, STOP immediately, output the plan
 
 Before the implementation `<plan>`, when the request is **ambiguous**, **greenfield**, or clearly **workflow-scale**, briefly refine intent:
 
-1. Ask short clarifying questions only if needed (prefer one focused question).
+1. Ask short clarifying questions only if needed (prefer one focused question). Prefer a short **grill** when branches matter: chase open decisions until the important forks are resolved (or the user says skip).
 2. Present the design in **short chunks** the human can accept or correct.
 3. Then output the implementation `<plan>` and wait for `GO`.
 
-Skip when the user already gave a concrete approach, a file-level brief, or says to skip design. Note `Design notes: skipped` (or a one-line summary) inside the `<plan>` when useful. This does **not** replace Plan Gate.
+Skip when the user already gave a concrete approach, a file-level brief, or says to skip design/grill. Note `Design notes: skipped` | `grilled: <one-line>` inside the `<plan>` when useful. This does **not** replace Plan Gate. User-invoked deep alignment: `/grill`.
+
+## Shared language (optional)
+
+For longer-lived product repos, an optional root **`CONTEXT.md`** may hold the project’s shared language: glossary of domain terms, and pointers to hard decisions (short ADR links or bullets). Prefer those terms in chat and code names so the agent does not use twenty words where one will do.
+
+Doc split (do not merge into one blob):
+
+| Doc | Role |
+|-----|------|
+| `CONTEXT.md` | Domain jargon / ubiquitous language |
+| `AGENTS.md` | Layout, conventions, verify, forbidden zones |
+| `@project` / `project.mdc` | Stack, entry points, commands |
+
+If `CONTEXT.md` is absent, do **not** invent a mandatory one for tiny or assessment tasks. Create/update it only when the user asks, after a `/grill` that produced new terms, or when greenfield domain language would otherwise stay undocumented.
 
 ## Explore Cheap
 
@@ -83,9 +97,11 @@ During execution, after completing a breakdown step, do a quick two-stage self-c
 When hunting a bug (or the user runs `/debug`), before broad edits:
 
 1. **Reproduce** — exact failing command/symptom (or state what blocks repro).
-2. **Hypothesize** — one primary cause (and optional secondary).
-3. **Evidence** — smallest check that would confirm/reject (log, test, bisect read).
-4. **Fix** — only then change code; re-run the failing verify.
+2. **Minimise** — shrink the failing case when cheap (smaller input, single path).
+3. **Hypothesize** — one primary cause (and optional secondary).
+4. **Instrument / evidence** — smallest check that would confirm/reject (log, test, bisect read).
+5. **Fix** — only then change code.
+6. **Regression check** — re-run the failing verify; add or extend a test when the project already has a harness and the bug could return.
 
 Do not spray unrelated changes hoping the bug disappears. `/loop` still applies after a fix if verify fails.
 
@@ -174,16 +190,21 @@ When pausing a non-trivial task, update `progress.md` **Handoff** (plan status, 
 - `AGENTS.md` / `README.md` are the successor entry points; keep them truthful when you add run paths, layout, or verify steps.
 - Do NOT auto-create `.gitignore`; the user's global gitignore already covers common noise (node_modules, .venv, __pycache__, Cursor caches). Add project-specific ignores only when asked.
 
-## Submission docs (auto-bootstrap — strategy A)
+## Submission docs (opt-in only)
 
-Default for **non-trivial** work in any project (interview or not):
+**Default: off.** Do **not** create, detect, or update `submission/` on ordinary non-trivial work. Prefer **inline why-comments** (and Maintainability tiers for public APIs / file headers) unless the user explicitly wants write-up docs.
 
-1. **Detect** whether `submission/` exists at the project root with `1. Handover.md`, `2. Reflection.md`, and `3. Appendix.md`.
-2. **If missing:** create `submission/` and copy those three files from the local cursor-prime clone:
+Enable `submission/` **only** when one of these is true:
+
+1. User ran **`/submission-init`**, or
+2. User explicitly asked for handover / reflection / appendix / assessment write-up docs (or named the `submission/` trio).
+
+When enabled:
+
+1. Scaffold from the local cursor-prime clone if missing:
    - Prefer `$env:USERPROFILE\cursor-prime\payload\submission\*.md` (Windows) or the user’s known clone path (e.g. `C:\XW\cursor-prime\payload\submission\`).
-   - If the clone cannot be found, create the three files using the same Title Case structure as cursor-prime’s payload templates (Handover / Reflection / Appendix) rather than skipping.
-3. **Grow** the three docs during the task: update after meaningful decisions, before verify/done, and when the pre-flight file list changes (especially Appendix sync checklist). English body; Title Case headings.
-4. **Opt-out:** if the user says not to use submission / skip handover docs / no submission for this project, do **not** create or update `submission/` for that task (note the opt-out in the plan Out of scope).
-5. List `submission/*` on the pre-flight file list when you will create or edit them.
+   - If the clone cannot be found, create the three Title Case files (Handover / Reflection / Appendix) rather than skipping.
+2. Grow the three docs during the task; English body; Title Case headings.
+3. List `submission/*` on the pre-flight file list when creating or editing them.
 
-`/submission-init` forces scaffold even on an otherwise trivial request.
+If submission is not enabled for the task, note that in plan **Out of scope** when relevant (e.g. interview pad with docs optional).

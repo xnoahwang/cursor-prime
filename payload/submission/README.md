@@ -10,7 +10,7 @@ Copy this folder into a project as **`submission/`**, then fill the three files 
 
 **Timed assessment:** keep `meta-instruction.md` under your local gitignored `coderpad/` folder (not shipped in git). New empty project → copy that file to the project root as the **only** starter file → ask the agent to read it and guide in Chinese, one step at a time.
 
-Auto-created on non-trivial tasks (unless opted out) or via `/submission-init`.
+Auto-created: **no** (opt-in only). Use `/submission-init` or explicitly ask for submission/handover docs.
 
 ## Copy steps
 
