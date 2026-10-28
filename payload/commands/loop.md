@@ -22,6 +22,7 @@ Each iteration:
 ## Rules
 
 - One failure per iteration unless the plan explicitly allows batch fixes.
+- If the **same failure** shows up again, add a check that would have caught it (test, lint, or types) before another chat reminder. Change structure when that makes the wrong path harder. First occurrence: still the smallest fix, then re-verify.
 - Do not expand pre-flight file list without STOP and explain.
 - No soft self-grade (1–10 rubrics) as sole proof when a hard gate exists.
 - Credit guard: context grows each pass — stay surgical.
