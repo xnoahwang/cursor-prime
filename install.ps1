@@ -165,7 +165,7 @@ try { Set-Clipboard -Value $userRulesText -ErrorAction Stop; $clipOk = $true } c
 
 $manifest = [pscustomobject]@{
     name         = 'cursor-prime'
-    version      = '0.3.3'
+    version      = '0.3.4'
     installed_at = (Get-Date).ToString('o')
     with_hooks   = [bool]$WithHooks
     files        = $installedFiles

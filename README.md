@@ -53,7 +53,7 @@ After setup you get:
 - **Task class** — trivial tasks skip ceremony; workflow-scale tasks need a bite-sized task breakdown with per-step verify.
 - **Explore cheap** — search-first, read-minimal; the pre-flight file list bounds reads and writes.
 - **Surgical Changes** — don't touch adjacent code, comments, or formatting; every changed line traces to the request.
-- **Simplicity** — build only what was asked; no speculative abstractions.
+- **Simplicity / least new code** — build only what was asked; reuse what is already there; do not add a dependency for a few lines; do not cut validation, security, or accessibility to shorten a diff.
 - **Systematic debugging** — reproduce → minimise → hypothesize → evidence → fix → regression check (also `/debug`).
 
 **Honest reporting (what the AI is told to produce):**
@@ -78,6 +78,10 @@ After setup you get:
 - **Global gitignore** — `__pycache__`, `node_modules`, `.venv`, IDE/OS noise, Cursor caches.
 
 ## Changelog
+
+### v0.3.4
+- **Least new code** — reuse existing code, the platform, or an installed dependency before writing new code. Never cut trust-boundary validation, data-loss handling, security, or accessibility to shorten a diff. When the project already has tests, that new logic leaves one small test.
+- **Re-install + re-paste User Rules** required (`install.ps1 -Force`).
 
 ### v0.3.3
 - **Submission is opt-in only** — no auto-bootstrap on non-trivial tasks; prefer inline why-comments. Enable via `/submission-init` or an explicit ask for submission/handover docs.
@@ -196,7 +200,7 @@ git pull
 .\install.ps1 -Force
 ```
 
-Re-paste User Rules so they match **v0.3.3**.
+Re-paste User Rules so they match **v0.3.4**.
 
 ## Uninstall
 
