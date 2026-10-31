@@ -15,6 +15,12 @@
     and ~/.cursor-prime-user-rules.txt. Cursor has no file API for User Rules —
     paste once into Settings -> Rules -> User Rules; then every project inherits them.
 
+    If the global security-audit skill is missing, installs it with npx. The skills
+    CLI writes that copy to ~/.agents/skills/security-audit (Cursor loads this for
+    every local project). ~/.cursor/skills/security-audit/SKILL.md also counts as
+    present. The install fails when that command fails. uninstall.ps1 does not
+    remove the skill.
+
     Existing files are backed up to <file>.bak.<timestamp>. A manifest at
     ~/.cursor-prime-manifest.json records what was installed so uninstall.ps1
     can undo precisely.
@@ -163,9 +169,31 @@ $installedFiles += [pscustomobject]@{ path = $userRulesFile; backup = $null }
 $clipOk = $false
 try { Set-Clipboard -Value $userRulesText -ErrorAction Stop; $clipOk = $true } catch { $clipOk = $false }
 
+# Global skill, every project. Not listed in the manifest: uninstall must not delete it.
+# npx skills writes Cursor's global copy under ~/.agents/skills. Cursor also reads ~/.cursor/skills.
+$securityAuditMarkers = @(
+    (Join-Path $HomeDir '.agents\skills\security-audit\SKILL.md'),
+    (Join-Path $HomeDir '.cursor\skills\security-audit\SKILL.md')
+)
+$securityAuditSkill = $securityAuditMarkers | Where-Object { Test-Path $_ } | Select-Object -First 1
+if ($securityAuditSkill) {
+    Log "Security audit skill already present: $securityAuditSkill"
+} else {
+    Log "Installing global security audit skill (npx)..."
+    & npx --yes skills add https://github.com/cloudflare/security-audit-skill --skill security-audit --global --agent cursor --yes --copy
+    if ($LASTEXITCODE -ne 0) {
+        throw "Security audit skill install failed (npx exit $LASTEXITCODE)."
+    }
+    $securityAuditSkill = $securityAuditMarkers | Where-Object { Test-Path $_ } | Select-Object -First 1
+    if (-not $securityAuditSkill) {
+        throw "Security audit skill install finished but marker missing: $($securityAuditMarkers -join ' or ')"
+    }
+    Log "Installed: $securityAuditSkill"
+}
+
 $manifest = [pscustomobject]@{
     name         = 'cursor-prime'
-    version      = '0.3.4'
+    version      = '0.3.5'
     installed_at = (Get-Date).ToString('o')
     with_hooks   = [bool]$WithHooks
     files        = $installedFiles

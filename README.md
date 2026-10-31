@@ -11,7 +11,7 @@ A **global Cursor settings package**: Karpathy-derived coding rules, a strict Pl
 - **Karpathy discipline, automated.** Surgical changes, simplicity first, verifiable goals, terse output. No "Great! Let me also refactor this for you" sprawl.
 - **One machine setup.** Clone → `install.ps1` → paste into Settings → User Rules. No per-project init.
 - **Submission-ready (opt-in).** Templates for Handover / Reflection / Appendix live under `payload/submission/`. **Not** auto-created; use `/submission-init` or ask explicitly. Day-to-day: prefer **inline why-comments**. For timed pads, keep a local `coderpad/meta-instruction.md` (gitignored) when you want a Chinese step conductor.
-- **Zero lock-in.** One uninstall command and your machine is back to how it was (clear User Rules paste manually if you want a full reset).
+- **Uninstall.** `uninstall.ps1` removes the files it listed in the manifest and restores `core.excludesfile`. Clear the User Rules paste yourself for a full rules reset. The Cloudflare security-audit skill stays; it is not in the manifest.
 
 ## Repository layout (settings package)
 
@@ -39,8 +39,9 @@ Cursor has **no reliable global rules file** — that's a [known limitation](htt
 | Global slash commands `~/.cursor/commands/*.md` | global | `install.ps1` | ✅ reliable |
 | `~/.cursor/rules/behavior.mdc` | global | `install.ps1` (best-effort) | ⚠️ version-dependent |
 | `~/.gitignore_global` | global | `install.ps1` | ✅ reliable |
+| Security audit skill `~/.agents/skills/security-audit/` | global | `install.ps1` via `npx` when missing | ✅ on demand (does not run an audit by itself) |
 
-**Recommended setup:** `git clone` → run `install.ps1` once → paste into **Settings → Rules → User Rules** (clipboard + `~/.cursor-prime-user-rules.txt`). That paste is **Coding Behavior + Maintainability**. Optional: `/submission-init` when you explicitly want the Handover / Reflection / Appendix trio.
+**Recommended setup:** `git clone` → run `install.ps1` once → paste into **Settings → Rules → User Rules** (clipboard + `~/.cursor-prime-user-rules.txt`). That paste is **Coding Behavior + Maintainability**. The installer also ensures the global security-audit skill. Optional: `/submission-init` when you explicitly want the Handover / Reflection / Appendix trio.
 
 ## What it does
 
@@ -53,7 +54,7 @@ After setup you get:
 - **Task class** — trivial tasks skip ceremony; workflow-scale tasks need a bite-sized task breakdown with per-step verify.
 - **Explore cheap** — search-first, read-minimal; the pre-flight file list bounds reads and writes.
 - **Surgical Changes** — don't touch adjacent code, comments, or formatting; every changed line traces to the request.
-- **Simplicity / least new code** — build only what was asked; reuse what is already there; do not add a dependency for a few lines; do not cut validation, security, or accessibility to shorten a diff.
+- **Simplicity / least new code** — from [ponytail](https://github.com/DietrichGebert/ponytail), the ladder only: reuse this codebase, then the platform, then an installed dependency, then one readable line, then the minimum that works. Do not cut trust-boundary validation, data-loss handling, security, accessibility, or anything asked for. A small test only when the project already has tests. Ponytail's hooks and `/ponytail` commands are not installed.
 - **Systematic debugging** — reproduce → minimise → hypothesize → evidence → fix → regression check (also `/debug`).
 
 **Honest reporting (what the AI is told to produce):**
@@ -74,13 +75,19 @@ After setup you get:
 - **`/handoff`** — raise the bar to tier D: public API docs, module headers, truthful `AGENTS.md` / `README` / `@project`.
 - **`/delta`** — produce a Delta Report for work just done.
 - **`/submission-init`** — **opt-in** scaffold for `submission/` Handover / Reflection / Appendix (off by default).
+- **Security audit skill** — from [cloudflare/security-audit-skill](https://github.com/cloudflare/security-audit-skill). `install.ps1` runs `npx` when both `~/.agents/skills/security-audit/SKILL.md` and `~/.cursor/skills/security-audit/SKILL.md` are missing. The CLI writes the first path; Cursor loads it for every local project. Ask for a security audit to run it. The installer does not audit the repo, and `payload/` does not contain the skill.
 - **Optional hooks** — `-WithHooks` on install asks before destructive shell commands (off by default).
 - **Global gitignore** — `__pycache__`, `node_modules`, `.venv`, IDE/OS noise, Cursor caches.
 
 ## Changelog
 
+### v0.3.5
+- **Light install of [cloudflare/security-audit-skill](https://github.com/cloudflare/security-audit-skill)** — `install.ps1` runs `npx --yes skills add https://github.com/cloudflare/security-audit-skill --skill security-audit --global --agent cursor --yes --copy` when the skill is missing. The CLI writes `~/.agents/skills/security-audit/`; `~/.cursor/skills/security-audit/SKILL.md` also counts as present. It does not run an audit, and the skill is not copied into `payload/`. `uninstall.ps1` does not remove it. `npx` failure fails the install.
+- **Re-install** required (`install.ps1 -Force`). User Rules text is unchanged from v0.3.4, so no re-paste.
+
 ### v0.3.4
-- **Least new code** — reuse existing code, the platform, or an installed dependency before writing new code. Never cut trust-boundary validation, data-loss handling, security, or accessibility to shorten a diff. When the project already has tests, that new logic leaves one small test.
+- **Light absorb from [ponytail](https://github.com/DietrichGebert/ponytail)** (the ladder only, in User Rules): reuse existing code, the platform, or an installed dependency before writing new code. Never cut trust-boundary validation, data-loss handling, security, or accessibility to shorten a diff. When the project already has tests, that new logic leaves one small test.
+- Still **not** installed: ponytail hooks and `/ponytail` commands. Those inject a second always-on ruleset.
 - **Re-install + re-paste User Rules** required (`install.ps1 -Force`).
 
 ### v0.3.3
@@ -184,6 +191,7 @@ Ask a read-only question. **Pass:** direct answer, no wait for `GO`.
 | `~/.cursor/hooks.json` + hooks script | `payload/hooks/*` (only with `-WithHooks`) |
 | `~/.gitignore_global` | `payload/gitignore_global` |
 | `~/.cursor-prime-user-rules.txt` | generated from `payload/behavior.mdc` + `maintainability.mdc` |
+| `~/.agents/skills/security-audit/` | `npx` when neither this nor `~/.cursor/skills/security-audit/SKILL.md` exists (not removed by uninstall) |
 | `git config --global core.excludesfile` | set to `~/.gitignore_global` |
 
 Manifest: `~/.cursor-prime-manifest.json`.
@@ -200,7 +208,7 @@ git pull
 .\install.ps1 -Force
 ```
 
-Re-paste User Rules so they match **v0.3.4**.
+Re-paste User Rules when the rules text changed. **v0.3.5** leaves that text as in v0.3.4 and ensures `~/.agents/skills/security-audit/SKILL.md`.
 
 ## Uninstall
 
@@ -209,7 +217,7 @@ cd $env:USERPROFILE\cursor-prime
 .\uninstall.ps1
 ```
 
-Removes manifest-listed files and restores `core.excludesfile`. Clear User Rules in Settings manually if desired. `-RestoreBackups` restores install-time backups.
+Removes manifest-listed files and restores `core.excludesfile`. It leaves `~/.agents/skills/security-audit/` in place. Clear User Rules in Settings manually if desired. `-RestoreBackups` restores install-time backups.
 
 ## Safety
 
